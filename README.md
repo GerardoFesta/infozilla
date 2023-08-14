@@ -1,4 +1,4 @@
-# infoZilla
+# infoZilla - IGES
 The `infoZilla` tool is a library and tool for extracting structural software engineering data from unstructrured data sources such as e-mails, discussions, bug reports and wiki pages.
 
 Out of the box, the `infoZilla` tool finds the following artefacts:
