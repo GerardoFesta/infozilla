@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infozilla-output>
+  <Patches amount="1">
+    <Patch>
+      <index>file_modificato.txt</index>
+      <original_file>file_modificato.txt</original_file>
+      <modified_file>file_modificato.txt</modified_file>
+      <Hunks>
+        <hunk />
+      </Hunks>
+    </Patch>
+  </Patches>
+  <Stacktraces amount="1">
+    <Stacktrace timestamp="1692708768239">
+      <Exception>org.eclipse.core.internal.resources.ResourceException</Exception>
+      <Reason>:
+        Resource /org.eclipse.debug.core/.classpath is not local.</Reason>
+      <Frames>
+        <Frame depth="0">org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)</Frame>
+        <Frame depth="1">org.eclipse.core.internal.resources.File.getContents(File.java:213)</Frame>
+        <Frame depth="2">org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)</Frame>
+        <Frame depth="3">org.eclipse.jdt.internal.core.JavaProject.getSharedProperty(JavaProject.java:1793)</Frame>
+        <Frame depth="4">org.eclipse.jdt.internal.core.JavaProject.readClasspathFile(JavaProject.java:2089)</Frame>
+        <Frame depth="5">org.eclipse.jdt.internal.core.JavaProject.getRawClasspath(JavaProject.java:1579)</Frame>
+        <Frame depth="6">org.eclipse.jdt.internal.core.search.indexing.IndexAllProject.execute(IndexAllProject.java:77)</Frame>
+        <Frame depth="7">org.eclipse.jdt.internal.core.search.processing.JobManager.run(JobManager.java:371)</Frame>
+      </Frames>
+    </Stacktrace>
+  </Stacktraces>
+  <SourceCodeRegions amount="1">
+    <source_code type="functioncall">
+      <location start="3368" end="3448" />
+      <code>(IncrementalProjectBuilder.INCREMENTAL_BUILD,new SubProgressMonitor(monitor,1));</code>
+    </source_code>
+  </SourceCodeRegions>
+  <Enumerations amount="1">
+    <Enumeration lines="20">
+      <Lines>
+        <Line>1. If autobuilding is on, we turn it off.</Line>
+        <Line />
+        <Line>2. We import all the plug-ins selected in the import wizard and create a Java</Line>
+        <Line>project for each plug-in that contains libraries.  Note that at this step, we</Line>
+        <Line>used to clear the classpath of the freshly created Java project because we</Line>
+        <Line>will correctly set it at a later step.  However, just before we released 2.1,</Line>
+        <Line>Philippe suggested in bug report 34574 that we do not flush the classpath</Line>
+        <Line>completely.  So we stopped flushing the classpath at this point, and this</Line>
+        <Line>introduced the transient error markers that we now see in the Problems view in</Line>
+        <Line>the middle of the operation.  Since these error markers go away later in step</Line>
+        <Line>3 when we set the classpath, we regarded them as benign, yet still annoying,</Line>
+        <Line>intermediary entities.  This step is done in an IWorkspace.run(IWorkspaceRunnable, IProgressMonitor) operation.</Line>
+        <Line />
+        <Line>3. We set the classpath of all the projects that were succesfully imported</Line>
+        <Line>into the workspace. This step has to be done in a subsequent IWorkspace.run(IWorkspaceRunnable, IProgressMonitor)</Line>
+        <Line>operation for an accurate classpath computation.</Line>
+        <Line>i.e. the Java projects from step 2 have to become part of the workspace before we set their classpath.</Line>
+        <Line />
+        <Line>4.  If we had turned autobuilding off in step 1, we turn it back on and invoke</Line>
+        <Line>a build via PDEPlugin.getWorkspace().build</Line>
+      </Lines>
+    </Enumeration>
+  </Enumerations>
+</infozilla-output>
+

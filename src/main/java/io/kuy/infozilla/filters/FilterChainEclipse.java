@@ -69,28 +69,32 @@ public class FilterChainEclipse implements FilterChain {
 		
 		if (runPatches) {
 			patches = patchFilter.runFilter(outputText);
+			outputText = patchFilter.getOutputText();
 		} else patches = new ArrayList<Patch>();
 		
-		outputText = patchFilter.getOutputText();
+
 		
 		if (runTraces) {
 			traces = stacktraceFilter.runFilter(outputText);
+			outputText = stacktraceFilter.getOutputText();
 		} else traces = new ArrayList<StackTrace>();
 		
-		outputText = stacktraceFilter.getOutputText();
+
 		
 		if (runSource) {
 			regions = sourcecodeFilter.runFilter(outputText);
+			outputText = sourcecodeFilter.getOutputText();
 		} else regions = new ArrayList<CodeRegion>();
 		
-		outputText = sourcecodeFilter.getOutputText();
+
 		 
 		if (runEnums) {
 			enumerations = enumFilter.runFilter(outputText);
+			outputText = enumFilter.getOutputText();
 		} else enumerations = new ArrayList<Enumeration>();
 		
 		// The output of the filter chain
-		outputText = sourcecodeFilter.getOutputText();
+
 	}
 
 	/**

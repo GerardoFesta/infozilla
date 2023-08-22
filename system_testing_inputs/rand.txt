@@ -1,0 +1,454 @@
+Hi.
+
+I'm using gson (version 2.8.8), and only with JDK 17 this code:
+
+```
+JsonReader configFileReader = new JsonReader(new FileReader(new File("C:\test.txt"));
+result = gson.fromJson(configFileReader, clazz);
+```
+
+throws this exception:
+```
+Exception in thread "main" java.lang.reflect.InaccessibleObjectException: Unable to make field private final java.lang.String java.security.KeyFactory.algorithm accessible: module java.base does not "opens java.security" to unnamed module @4445629
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:354)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:297)
+	at java.base/java.lang.reflect.Field.checkCanSetAccessible(Field.java:178)
+	at java.base/java.lang.reflect.Field.setAccessible(Field.java:172)
+	at com.google.gson.internal.reflect.UnsafeReflectionAccessor.makeAccessible(UnsafeReflectionAccessor.java:44)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.getBoundFields(ReflectiveTypeAdapterFactory.java:159)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.create(ReflectiveTypeAdapterFactory.java:102)
+	at com.google.gson.Gson.getAdapter(Gson.java:458)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.createBoundField(ReflectiveTypeAdapterFactory.java:117)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.getBoundFields(ReflectiveTypeAdapterFactory.java:166)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.create(ReflectiveTypeAdapterFactory.java:102)
+	at com.google.gson.Gson.getAdapter(Gson.java:458)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.createBoundField(ReflectiveTypeAdapterFactory.java:117)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.getBoundFields(ReflectiveTypeAdapterFactory.java:166)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.create(ReflectiveTypeAdapterFactory.java:102)
+	at com.google.gson.Gson.getAdapter(Gson.java:458)
+	at com.google.gson.internal.bind.CollectionTypeAdapterFactory.create(CollectionTypeAdapterFactory.java:53)
+	at com.google.gson.Gson.getAdapter(Gson.java:458)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.createBoundField(ReflectiveTypeAdapterFactory.java:117)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.getBoundFields(ReflectiveTypeAdapterFactory.java:166)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.create(ReflectiveTypeAdapterFactory.java:102)
+	at com.google.gson.Gson.getAdapter(Gson.java:458)
+	at com.google.gson.Gson.fromJson(Gson.java:931)
+
+```
+
+The same code works with previous JDK's.
+
+
+Similar to #1963 and other existing reports. Apparently you are deserializing a JDK class (`java.security.KeyFactory`) without having specified a custom type adapter for it. Gson will then by default use a reflection based type adapter. You have to write a [custom type adapter](https://javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/TypeAdapter.html) to solve this issue.
+
+The reason why this is causing an exception for JDK 17 is because JDK internals are now strongly encapsulated (see [JEP 403](https://openjdk.java.net/jeps/403)).
+In general you should avoid using reflection based serialization and deserialization for classes which you do not control because you rely on their implementation details which could change at any point. (Unfortunately Gson currently does not have a setting for easily blocking such undesired reflective access.)
+
+---
+
+Note that I am not a maintainer of this project.
+
+We are seeing another example of consequences from "JEP 403: Strongly Encapsulate JDK Internals" in Gson code.
+
+We are returning array type from the API:
+
+```
+The request parameter `reviewed` changes the response to return a list
+of the paths the caller has marked as reviewed.
+```
+
+The code in GerritCodeReview can return `Collections.emptyList()`, see [1]:
+
+```java
+    private Collection<String> reviewed(RevisionResource resource) throws AuthException {
+      CurrentUser user = self.get();
+      if (!user.isIdentifiedUser()) {
+        throw new AuthException("Authentication required");
+      }
+
+      Account.Id userId = user.getAccountId();
+      PatchSet patchSetId = resource.getPatchSet();
+      Optional<PatchSetWithReviewedFiles> o;
+      o = accountPatchReviewStore.call(s -> s.findReviewed(patchSetId.id(), userId));
+
+      if (o.isPresent()) {
+        PatchSetWithReviewedFiles res = o.get();
+        if (res.patchSetId().equals(patchSetId.id())) {
+          return res.files();
+        }
+
+        try {
+          return copy(res.files(), res.patchSetId(), resource, userId);
+        } catch (IOException | DiffNotAvailableException e) {
+          logger.atWarning().withCause(e).log("Cannot copy patch review flags");
+        }
+      }
+
+      return Collections.emptyList();
+    }
+```
+
+Now, the Gson serialization started to fail on JDK 17:
+
+```
+Jan 08, 2022 10:44:16 PM com.google.gerrit.httpd.restapi.RestApiServlet replyInternalServerError
+SEVERE: Error in GET /a/changes/I7450561fb4ceb87d73a6405b01325f89e07fadc5/revisions/cf4192675a674bfe19bd7bc8c5c066412dd97ba8/files?reviewed: InaccessibleObjectException [CONTEXT project="com.google.gerrit.acceptance.api.change.ChangeIT_createEmptyChange_project" request="REST /changes/*/revisions/*/files" ]
+java.lang.reflect.InaccessibleObjectException: Unable to make private java.util.Collections$EmptyList() accessible: module java.base does not "opens java.util" to unnamed module @6646153
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:354)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:297)
+	at java.base/java.lang.reflect.Constructor.checkCanSetAccessible(Constructor.java:188)
+	at java.base/java.lang.reflect.Constructor.setAccessible(Constructor.java:181)
+	at com.google.gson.internal.reflect.UnsafeReflectionAccessor.makeAccessible(UnsafeReflectionAccessor.java:44)
+	at com.google.gson.internal.ConstructorConstructor.newDefaultConstructor(ConstructorConstructor.java:103)
+	at com.google.gson.internal.ConstructorConstructor.get(ConstructorConstructor.java:85)
+	at com.google.gson.internal.bind.CollectionTypeAdapterFactory.create(CollectionTypeAdapterFactory.java:54)
+	at com.google.gson.Gson.getAdapter(Gson.java:458)
+	at com.google.gson.Gson.toJson(Gson.java:696)
+	at com.google.gson.Gson.toJson(Gson.java:683)
+	at com.google.gson.Gson.toJson(Gson.java:658)
+	at com.google.gerrit.httpd.restapi.RestApiServlet.replyJson(RestApiServlet.java:1444)
+	at com.google.gerrit.httpd.restapi.RestApiServlet.service(RestApiServlet.java:653)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:742)
+	at com.google.inject.servlet.ServletDefinition.doServiceImpl(ServletDefinition.java:290)
+	at com.google.inject.servlet.ServletDefinition.doService(ServletDefinition.java:280)
+	at com.google.inject.servlet.ServletDefinition.service(ServletDefinition.java:184)
+	at com.google.inject.servlet.ManagedServletPipeline.service(ManagedServletPipeline.java:89)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:85)
+	at com.google.gerrit.httpd.GetUserFilter.doFilter(GetUserFilter.java:92)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:82)
+	at com.google.gerrit.httpd.RunAsFilter.doFilter(RunAsFilter.java:120)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:82)
+	at com.google.gerrit.httpd.RequireIdentifiedUserFilter.doFilter(RequireIdentifiedUserFilter.java:50)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:82)
+	at com.google.gerrit.httpd.SetThreadNameFilter.doFilter(SetThreadNameFilter.java:62)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:82)
+	at com.google.gerrit.httpd.AllRequestFilter$FilterProxy$1.doFilter(AllRequestFilter.java:139)
+	at com.google.gerrit.httpd.AllowRenderInFrameFilter.doFilter(AllowRenderInFrameFilter.java:56)
+	at com.google.gerrit.httpd.AllRequestFilter$FilterProxy$1.doFilter(AllRequestFilter.java:135)
+	at com.google.gerrit.httpd.AllRequestFilter$FilterProxy.doFilter(AllRequestFilter.java:141)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:82)
+	at com.google.gerrit.httpd.RequestCleanupFilter.doFilter(RequestCleanupFilter.java:60)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:82)
+	at com.google.gerrit.httpd.ProjectBasicAuthFilter.doFilter(ProjectBasicAuthFilter.java:111)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:82)
+	at com.google.gerrit.httpd.RequestMetricsFilter.doFilter(RequestMetricsFilter.java:92)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:82)
+	at com.google.gerrit.httpd.RequestContextFilter.doFilter(RequestContextFilter.java:64)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:82)
+	at com.google.inject.servlet.ManagedFilterPipeline.dispatch(ManagedFilterPipeline.java:121)
+	at com.google.inject.servlet.GuiceFilter.doFilter(GuiceFilter.java:133)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:193)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1601)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:548)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:233)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1624)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:233)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1435)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:188)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:501)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1594)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:186)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1350)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:141)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:127)
+	at org.eclipse.jetty.server.Server.handle(Server.java:516)
+	at org.eclipse.jetty.server.HttpChannel.lambda$handle$1(HttpChannel.java:388)
+	at org.eclipse.jetty.server.HttpChannel.dispatch(HttpChannel.java:633)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:380)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:273)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:311)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:105)
+	at org.eclipse.jetty.io.ChannelEndPoint$1.run(ChannelEndPoint.java:104)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:336)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:313)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:171)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.produce(EatWhatYouKill.java:135)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:773)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:905)
+	at java.base/java.lang.Thread.run(Thread.java:833)
+```
+
+This patch fixed it:
+
+```diff
+diff --git a/java/com/google/gerrit/server/restapi/change/Files.java b/java/com/google/gerrit/server/restapi/change/Files.java
+index e9961695c3..ab57052fa5 100644
+--- a/java/com/google/gerrit/server/restapi/change/Files.java
++++ b/java/com/google/gerrit/server/restapi/change/Files.java
+@@ -14,6 +14,7 @@
+
+ package com.google.gerrit.server.restapi.change;
+
++import com.google.common.collect.ImmutableList;
+ import com.google.common.collect.Iterables;
+ import com.google.common.collect.Lists;
+ import com.google.common.flogger.FluentLogger;
+@@ -58,7 +59,6 @@ import com.google.inject.Singleton;
+ import java.io.IOException;
+ import java.util.ArrayList;
+ import java.util.Collection;
+-import java.util.Collections;
+ import java.util.List;
+ import java.util.Map;
+ import java.util.Optional;
+@@ -260,7 +260,7 @@ public class Files implements ChildCollection<RevisionResource, FileResource> {
+         }
+       }
+
+-      return Collections.emptyList();
++      return ImmutableList.of();
+     }
+
+     private List<String> copy(
+
+```
+
+I wonder this is the right thing to fix all Gson clients to abandon the usage of `Collections.emptyList()` in entities or whether it could/should be fixed on Gson side.
+
+**Update**
+
+Next failure is in `java.util.Collections$EmptyMap()`:
+
+```
+SEVERE: Error in POST /a/config/server/reload: InaccessibleObjectException [CONTEXT request="REST /config/*/reload" ]
+java.lang.reflect.InaccessibleObjectException: Unable to make private java.util.Collections$EmptyMap() accessible: module java.base does not "opens java.util" to unnamed module @2a48d10f
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:354)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:297)
+	at java.base/java.lang.reflect.Constructor.checkCanSetAccessible(Constructor.java:188)
+	at java.base/java.lang.reflect.Constructor.setAccessible(Constructor.java:181)
+	at com.google.gson.internal.reflect.UnsafeReflectionAccessor.makeAccessible(UnsafeReflectionAccessor.java:44)
+	at com.google.gson.internal.ConstructorConstructor.newDefaultConstructor(ConstructorConstructor.java:103)
+	at com.google.gson.internal.ConstructorConstructor.get(ConstructorConstructor.java:85)
+	at com.google.gson.internal.bind.MapTypeAdapterFactory.create(MapTypeAdapterFactory.java:127)
+	at com.google.gson.Gson.getAdapter(Gson.java:458)
+	at com.google.gson.Gson.toJson(Gson.java:696)
+	at com.google.gson.Gson.toJson(Gson.java:683)
+	at com.google.gson.Gson.toJson(Gson.java:658)
+	at com.google.gerrit.httpd.restapi.RestApiServlet.replyJson(RestApiServlet.java:1444)
+```
+
+[1] https://gerrit.googlesource.com/gerrit/+/refs/heads/master/java/com/google/gerrit/server/restapi/change/Files.java#263
+
+@davido, that specifiy issue is indeed a bug with Gson, see #1875. It should be fixed already on `master` but has not been released yet.
+@Marcono1234 Thanks for the pointer!
+
+I have built `gson` from source (`2.9.0-SNAPSHOT`), and adapted GerritCodeReview build and it fixed the problem with `java.util.Collections`.
+
+However, I still see complication with `java.util.Option` class used in to be serialized entities classes, e.g. [SubmitRequirement](https://gerrit.googlesource.com/gerrit/+/refs/heads/master/java/com/google/gerrit/entities/SubmitRequirement.java):
+
+```
+12) submitRequirement_serialize(com.google.gerrit.server.cache.serialize.entities.SubmitRequirementJsonSerializerTest)
+com.google.gson.JsonIOException: Failed making field 'java.util.Optional#value' accessible; either change its visibility or write a custom TypeAdapter for its declaring type
+	at com.google.gson.internal.reflect.ReflectionHelper.makeAccessible(ReflectionHelper.java:22)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.getBoundFields(ReflectiveTypeAdapterFactory.java:158)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.create(ReflectiveTypeAdapterFactory.java:101)
+	at com.google.gson.Gson.getAdapter(Gson.java:494)
+	at com.google.gerrit.entities.AutoValue_SubmitRequirement$GsonTypeAdapter.write(AutoValue_SubmitRequirement.java:65)
+	at com.google.gerrit.entities.AutoValue_SubmitRequirement$GsonTypeAdapter.write(AutoValue_SubmitRequirement.java:31)
+	at com.google.gson.TypeAdapter.toJson(TypeAdapter.java:142)
+	at com.google.gson.TypeAdapter.toJson(TypeAdapter.java:217)
+	at com.google.gerrit.server.cache.serialize.entities.SubmitRequirementJsonSerializerTest.submitRequirement_serialize(SubmitRequirementJsonSerializerTest.java:159)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.junit.runners.Suite.runChild(Suite.java:128)
+	at org.junit.runners.Suite.runChild(Suite.java:27)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at com.google.testing.junit.runner.internal.junit4.CancellableRequestFactory$CancellableRunner.run(CancellableRequestFactory.java:108)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at com.google.testing.junit.runner.junit4.JUnit4Runner.run(JUnit4Runner.java:116)
+	at com.google.testing.junit.runner.BazelTestRunner.runTestsInSuite(BazelTestRunner.java:159)
+	at com.google.testing.junit.runner.BazelTestRunner.main(BazelTestRunner.java:85)
+Caused by: java.lang.reflect.InaccessibleObjectException: Unable to make field private final java.lang.Object java.util.Optional.value accessible: module java.base does not "opens java.util" to unnamed module @2a48d10f
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:354)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:297)
+	at java.base/java.lang.reflect.Field.checkCanSetAccessible(Field.java:178)
+	at java.base/java.lang.reflect.Field.setAccessible(Field.java:172)
+	at com.google.gson.internal.reflect.ReflectionHelper.makeAccessible(ReflectionHelper.java:19)
+	... 39 more
+```
+I would have expected that `java.util.Option` should just work out of the box in `gson` even with JDK 17, similarly to `java.util.Collections.emptyList()`.
+
+See this upstream change: [1].
+
+[1] https://gerrit-review.googlesource.com/c/gerrit/+/327739
+> I have built `gson` from source (`2.9.0-SNAPSHOT`), and adapted GerritCodeReview build and it fixed the problem with `java.util.Collections`.
+
+That is great to hear!
+
+> However, I still see complication with `java.util.Option` class
+
+Unfortunately Gson still has Java 6 (soon Java 7) as minimum supported Java version. It does not provide a default adapter for `java.util.Optional` at the moment, see #1102. However, there is a StackOverflow answer [showing how it can be implemented](https://stackoverflow.com/a/25078422).
+
+---
+
+Note that I am not a member of this project.
+> (Unfortunately Gson currently does not have a setting for easily blocking such undesired reflective access.)
+
+Are there any plans to add an option to not register the `ReflectiveTypeAdapterFactory` by default? I suppose such an option would not only make my life easier.
+@arouel, I have [created a pull request a while ago](https://github.com/google/gson/pull/1905) which would allow filtering for which classes the default reflection based adapter should be used, so it should also be possible to implement a filter which blocks all reflection based access. But I do not know what the maintainers think about this feature.
+I'm definitely sympathetic to making it possible to restrict the use of reflection. It's a major source of unpredictable behaviour and I think we should probably recommend that people restrict it by default, or at least restrict the use of platform classes (via #1905).
+I added --add-opens java.base/java.lang=ALL-UNNAMED but still have this exception
+```
+com.google.gson.JsonIOException: Failed making field 'java.util.Optional#value' accessible; either change its visibility or write a custom TypeAdapter for its declaring type
+	at com.google.gson.internal.reflect.ReflectionHelper.makeAccessible(ReflectionHelper.java:23)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.getBoundFields(ReflectiveTypeAdapterFactory.java:203)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.create(ReflectiveTypeAdapterFactory.java:112)
+	at com.google.gson.Gson.getAdapter(Gson.java:531)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.createBoundField(ReflectiveTypeAdapterFactory.java:137)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.getBoundFields(ReflectiveTypeAdapterFactory.java:211)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.create(ReflectiveTypeAdapterFactory.java:112)
+	at com.google.gson.Gson.getAdapter(Gson.java:531)
+	at com.google.gson.internal.bind.CollectionTypeAdapterFactory.create(CollectionTypeAdapterFactory.java:53)
+	at com.google.gson.Gson.getAdapter(Gson.java:531)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.createBoundField(ReflectiveTypeAdapterFactory.java:137)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.getBoundFields(ReflectiveTypeAdapterFactory.java:211)
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.create(ReflectiveTypeAdapterFactory.java:112)
+	at com.google.gson.Gson.getAdapter(Gson.java:531)
+	at com.google.gson.internal.bind.MapTypeAdapterFactory.create(MapTypeAdapterFactory.java:125)
+	at com.google.gson.Gson.getAdapter(Gson.java:531)
+	at com.google.gson.Gson.fromJson(Gson.java:1057)
+	at com.google.gson.Gson.fromJson(Gson.java:1016)
+	at com.google.gson.Gson.fromJson(Gson.java:959)
+```
+```
+Caused by: java.lang.reflect.InaccessibleObjectException: Unable to make field private final java.lang.Object ```
+java.util.Optional.value accessible: module java.base does not "opens java.util" to unnamed module @5f77d0f9
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:354)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:297)
+	at java.base/java.lang.reflect.Field.checkCanSetAccessible(Field.java:178)
+	at java.base/java.lang.reflect.Field.setAccessible(Field.java:172)
+	at com.google.gson.internal.reflect.ReflectionHelper.makeAccessible(ReflectionHelper.java:20)
+	... 28 common frames omitted
+```
+@eamonnmcmanus
+@a364176773, as mentioned in https://github.com/google/gson/issues/1979#issuecomment-1009142885, Gson has no built-in type adapter for `Optional`. Usage of `--add-opens` is merely a temporary workaround. I would recommend asking any questions about it on StackOverflow because this does not seem Gson specific; please also provide there a self-contained example with the exact arguments you are using to launch the Java process.
+
+---
+
+@eamonnmcmanus, do you think we can close this issue? As pointed out in the previous comments there is nothing Gson can / should do to solve this issue in my opinion. Users have to write a custom type adapter.
+Regarding your previous comment:
+> I think we should probably recommend that people restrict it by default, or at least restrict the use of platform classes (via https://github.com/google/gson/pull/1905)
+
+Do you think we should in the future configure Gson to block access to platform classes by default? (users could still overwrite it by specifying a custom reflection access filter)
+
+> @a364176773, as mentioned in [#1979 (comment)](https://github.com/google/gson/issues/1979#issuecomment-1009142885), Gson has no built-in type adapter for `Optional`. Usage of `--add-opens` is merely a temporary workaround. I would recommend asking any questions about it on StackOverflow because this does not seem Gson specific; please also provide there a self-contained example with the exact arguments you are using to launch the Java process.
+>
+> @eamonnmcmanus, do you think we can close this issue? As pointed out in the previous comments there is nothing Gson can / should do to solve this issue in my opinion. Users have to write a custom type adapter. Regarding your previous comment:
+>
+> > I think we should probably recommend that people restrict it by default, or at least restrict the use of platform classes (via #1905)
+>
+> Do you think we should in the future configure Gson to block access to platform classes by default? (users could still overwrite it by specifying a custom reflection access filter)
+
+https://github.com/alibaba/fastjson/issues/4077
+I found that another json component also had this problem, but they fixed it and we preferred to use gson instead of fastjson
+> [alibaba/fastjson#4077](https://github.com/alibaba/fastjson/issues/4077)
+> I found that another json component also had this problem, but they fixed it and we preferred to use gson instead of fastjson
+
+If I understand it correctly, that GitHub issue is mainly about how the exception is handled, but it does not allow you either to access JDK internals. The main difference is that fastjson seems to [provide built-in codecs for `Optional`](https://github.com/alibaba/fastjson/blob/bcd0505019425b2b8a7146828bec51739b933318/src/main/java/com/alibaba/fastjson/parser/deserializer/OptionalCodec.java), which is currently not the case for Gson (#1102).
+
+Either way, this is probably getting off-topic. My point was that Gson (and most likely any other object mapper) cannot access internal JDK fields using reflection ([JEP 403](https://openjdk.org/jeps/403)), which is the topic of this GitHub issue. Whether Gson should provide built-in adapters for more JDK types is a different topic and already tracked in separate GitHub issues.
+
+>
+
+I got it. thx
+It may be a good idea to include java.time adapters in the library by default. I find myself having to copy the same adapters across multiple projects and use a static utility to construct the Gson object. I understand you guys want to also support Java 7, but this really is a pain point.
+> It may be a good idea to include java.time adapters in the library by default.
+
+It might make sense for us to have a separate artifact that includes `TypeAdapter`s for `java.time`, `Optional`, and the like. Or perhaps just a single `TypeAdapterFactory` for those.
+So, how to deal with the startup failure caused by gson? Is there a solution
+Caused by: java.lang.ExceptionInInitializerError: null
+	at com.google.cloud.spanner.connection.StatementParser.<init>(StatementParser.java:223) ~[google-cloud-spanner-3.1.1.jar:3.1.1]
+	at com.google.cloud.spanner.connection.StatementParser.<clinit>(StatementParser.java:44) ~[google-cloud-spanner-3.1.1.jar:3.1.1]
+	at com.google.cloud.spanner.connection.ConnectionImpl.<init>(ConnectionImpl.java:77) ~[google-cloud-spanner-3.1.1.jar:3.1.1]
+	at com.google.cloud.spanner.connection.ConnectionOptions.getConnection(ConnectionOptions.java:648) ~[google-cloud-spanner-3.1.1.jar:3.1.1]
+	at com.google.cloud.spanner.jdbc.AbstractJdbcConnection.<init>(AbstractJdbcConnection.java:61) ~[google-cloud-spanner-jdbc-2.4.2.jar:2.4.2]
+	at com.google.cloud.spanner.jdbc.JdbcConnection.<init>(JdbcConnection.java:58) ~[google-cloud-spanner-jdbc-2.4.2.jar:2.4.2]
+	at com.google.cloud.spanner.jdbc.JdbcDriver.connect(JdbcDriver.java:194) ~[google-cloud-spanner-jdbc-2.4.2.jar:2.4.2]
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:138) ~[HikariCP-3.4.5.jar:na]
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:358) ~[HikariCP-3.4.5.jar:na]
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:206) ~[HikariCP-3.4.5.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:477) ~[HikariCP-3.4.5.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:560) ~[HikariCP-3.4.5.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:115) ~[HikariCP-3.4.5.jar:na]
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:112) ~[HikariCP-3.4.5.jar:na]
+	at org.hibernate.engine.jdbc.connections.internal.DatasourceConnectionProviderImpl.getConnection(DatasourceConnectionProviderImpl.java:122) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess.obtainConnection(JdbcEnvironmentInitiator.java:180) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:68) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:35) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.boot.registry.internal.StandardServiceRegistryImpl.initiateService(StandardServiceRegistryImpl.java:101) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:263) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:237) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:214) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.id.factory.internal.DefaultIdentifierGeneratorFactory.injectServices(DefaultIdentifierGeneratorFactory.java:152) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.injectDependencies(AbstractServiceRegistryImpl.java:286) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:243) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:214) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.<init>(InFlightMetadataCollectorImpl.java:176) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:127) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.metadata(EntityManagerFactoryBuilderImpl.java:1224) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1255) ~[hibernate-core-5.4.27.Final.jar:5.4.27.Final]
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:58) ~[spring-orm-5.2.10.RELEASE.jar:5.2.10.RELEASE]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:365) ~[spring-orm-5.2.10.RELEASE.jar:5.2.10.RELEASE]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:391) ~[spring-orm-5.2.10.RELEASE.jar:5.2.10.RELEASE]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:378) ~[spring-orm-5.2.10.RELEASE.jar:5.2.10.RELEASE]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:341) ~[spring-orm-5.2.10.RELEASE.jar:5.2.10.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1863) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1800) ~[spring-beans-5.3.21.jar:5.3.21]
+	... 17 common frames omitted
+Caused by: com.google.gson.JsonIOException: Failed making field 'java.util.regex.Pattern#pattern' accessible; either change its visibility or write a custom TypeAdapter for its declaring type
+	at com.google.gson.internal.reflect.ReflectionHelper.makeAccessible(ReflectionHelper.java:22) ~[gson-2.9.0.jar:na]
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.getBoundFields(ReflectiveTypeAdapterFactory.java:158) ~[gson-2.9.0.jar:na]
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.create(ReflectiveTypeAdapterFactory.java:101) ~[gson-2.9.0.jar:na]
+	at com.google.gson.Gson.getAdapter(Gson.java:501) ~[gson-2.9.0.jar:na]
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.createBoundField(ReflectiveTypeAdapterFactory.java:116) ~[gson-2.9.0.jar:na]
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.getBoundFields(ReflectiveTypeAdapterFactory.java:165) ~[gson-2.9.0.jar:na]
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.create(ReflectiveTypeAdapterFactory.java:101) ~[gson-2.9.0.jar:na]
+	at com.google.gson.Gson.getAdapter(Gson.java:501) ~[gson-2.9.0.jar:na]
+	at com.google.gson.internal.bind.CollectionTypeAdapterFactory.create(CollectionTypeAdapterFactory.java:53) ~[gson-2.9.0.jar:na]
+	at com.google.gson.Gson.getAdapter(Gson.java:501) ~[gson-2.9.0.jar:na]
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.createBoundField(ReflectiveTypeAdapterFactory.java:116) ~[gson-2.9.0.jar:na]
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.getBoundFields(ReflectiveTypeAdapterFactory.java:165) ~[gson-2.9.0.jar:na]
+	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.create(ReflectiveTypeAdapterFactory.java:101) ~[gson-2.9.0.jar:na]
+	at com.google.gson.Gson.getAdapter(Gson.java:501) ~[gson-2.9.0.jar:na]
+	at com.google.gson.Gson.fromJson(Gson.java:990) ~[gson-2.9.0.jar:na]
+	at com.google.gson.Gson.fromJson(Gson.java:929) ~[gson-2.9.0.jar:na]
+	at com.google.cloud.spanner.connection.ClientSideStatements.importStatements(ClientSideStatements.java:34) ~[google-cloud-spanner-3.1.1.jar:3.1.1]
+	at com.google.cloud.spanner.connection.ClientSideStatements.<clinit>(ClientSideStatements.java:27) ~[google-cloud-spanner-3.1.1.jar:3.1.1]
+	... 54 common frames omitted
+Caused by: java.lang.reflect.InaccessibleObjectException: Unable to make field private java.lang.String java.util.regex.Pattern.pattern accessible: module java.base does not "opens java.util.regex" to unnamed module @29e495ff
+	at java.base/java.lang.reflect.AccessibleObject.throwInaccessibleObjectException(AccessibleObject.java:387) ~[na:na]
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:363) ~[na:na]
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:311) ~[na:na]
+	at java.base/java.lang.reflect.Field.checkCanSetAccessible(Field.java:180) ~[na:na]
+	at java.base/java.lang.reflect.Field.setAccessible(Field.java:174) ~[na:na]
+	at com.google.gson.internal.reflect.ReflectionHelper.makeAccessible(ReflectionHelper.java:19) ~[gson-2.9.0.jar:na]
+	... 71 common frames omitted
+@yexiaobin909090 The specific error that you are running into is the one that is and fixed here: https://github.com/googleapis/java-spanner/pull/1426
+
+Upgrading your Spanner client to at least version 6.12.4 should fix this problem.
+> @yexiaobin909090 The specific error that you are running into is the one that is and fixed here: [googleapis/java-spanner#1426](https://github.com/googleapis/java-spanner/pull/1426)
+>
+> Upgrading your Spanner client to at least version 6.12.4 should fix this problem.
+
+Thank you very much. It's effective to upgrade to 6.12.5

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><infozilla-output>
+    <Patches amount="2">
+        <Patch>
+            <index>file_modificato.txt</index>
+            <original_file>file_modificato.txt</original_file>
+            <modified_file>file_modificato.txt</modified_file>
+            <Hunks>
+                <hunk/>
+                <hunk>Questo è un file di esempio.</hunk>
+            </Hunks>
+        </Patch>
+        <Patch>
+            <index>main.java</index>
+            <original_file>main.java</original_file>
+            <modified_file>main.java</modified_file>
+            <Hunks>
+                <hunk/>
+            </Hunks>
+        </Patch>
+    </Patches>
+    <Stacktraces amount="2">
+
+
+    </Stacktraces>
+    <SourceCodeRegions amount="4">
+        <source_code type="functioncall">
+            <location start="3438" end="3451"/>
+            <code>(monitor,1));</code>
+        </source_code>
+        <source_code type="ifstatement">
+            <location start="6038" end="6306"/>
+            <code>if (isJavaProject) {
+                /*IJavaProject jProject = JavaCore.create(project);
+                if (jProject.getRawClasspath() != null
+                &amp;&amp; jProject.getRawClasspath().length &gt; 0)
+                jProject.setRawClasspath(new IClasspathEntry[0], monitor);*/
+                modelIds.add(model.getPluginBase().getId());
+                }</code>
+        </source_code>
+        <source_code type="ifstatement">
+            <location start="6314" end="6516"/>
+            <code>if (isJavaProject) {
+                IJavaProject jProject = JavaCore.create(project);
+                jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
+                monitor);
+                modelIds.add(model.getPluginBase().getId());
+                }</code>
+        </source_code>
+        <source_code type="ifstatement">
+            <location start="7460" end="7662"/>
+            <code>if (isJavaProject) {
+                IJavaProject jProject = JavaCore.create(project);
+                jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
+                monitor);
+                modelIds.add(model.getPluginBase().getId());
+                }</code>
+        </source_code>
+    </SourceCodeRegions>
+    <Enumerations amount="0" />
+
+</infozilla-output>
