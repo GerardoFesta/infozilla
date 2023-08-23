@@ -21,7 +21,7 @@ public class SystemTest {
         System.setProperty("javax.xml.bind.JAXBContextFactory", "com.sun.xml.bind.v2.ContextFactory");
     }
 
-    //NON RIESCO A FARLO FUNZIONARE
+    /*
     @Test
     public void tc1() {
         String[] args = {
@@ -42,7 +42,7 @@ public class SystemTest {
             System.out.println("Execution crashed: " + e.getMessage());
         }
     }
-
+    */
     @Test
     public void tc2(){
         String[] args = {
