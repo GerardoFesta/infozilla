@@ -15,6 +15,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 13
+          distribution: 'adopt'
 
       - name: Run All System Tests
         run: ./gradlew clean test --tests "SystemTest.*"
