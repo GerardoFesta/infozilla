@@ -1,4 +1,4 @@
-<!-- remove_stacktrace.xsl -->
+<!-- remove_stacktrace_and_set_timestamp.xsl -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <!-- Identity transformation rule -->
@@ -8,7 +8,11 @@
         </xsl:copy>
     </xsl:template>
 
-    <!-- Exclude <Stacktrace timestamp> element -->
-    <xsl:template match="Stacktrace[@timestamp]"/>
+    <!-- Modify <Stacktrace> with @timestamp -->
+    <xsl:template match="Stacktrace[@timestamp]">
+        <Stacktrace timestamp="0">
+            <xsl:apply-templates select="node()"/>
+        </Stacktrace>
+    </xsl:template>
 
 </xsl:stylesheet>
