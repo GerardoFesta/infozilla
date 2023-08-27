@@ -17,6 +17,8 @@ repositories {
 
 test {
     useJUnitPlatform()
+    testClassesDirs = sourceSets.test.output
+    classpath = sourceSets.test.runtimeClasspath
 }
 
 dependencies {
@@ -30,6 +32,15 @@ dependencies {
     testImplementation 'org.xmlunit:xmlunit-core:2.8.2'
 
 }
+dependencies {
+
+
+    implementation 'junit:junit:4.13.1'
+    implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.x.x'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.x.x'
+}
+
 
 
 mainClassName = 'io.kuy.infozilla.cli.Main'
