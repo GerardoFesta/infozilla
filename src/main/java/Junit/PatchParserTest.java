@@ -110,9 +110,35 @@ public class PatchParserTest {
                 + "\n More changes.\n"
                 + "\n The end.", patch.getHunks().get(0).getText().replaceAll("\r", ""));
     }
-    //error Diff format not recognized
+    //ERROR unified diff not recognized
     @Test
-    public void testDiffPatch() {
+    public void testDiffPatch1(){
+        String inputText = "diff --git a/file_originale.txt b/file_modificato.txt\n"
+                + "index a1b2c3d..e4f5g6h 100644\n"
+                + "--- a/file_originale.txt\n"
+                + "+++ b/file_modificato.txt\n"
+                + "@@ -1,6 +1,6 @@\n"
+                + " Questo è un file di esempio.\n"
+                + "-Riga originale 1\n"
+                + "-Riga originale 2\n"
+                + "-Riga originale 3\n"
+                + "+Riga modificata 1\n"
+                + "+Riga modificata 2\n"
+                + "+Riga aggiunta 2.5\n"
+                + " Riga originale 4\n"
+                + "-Riga originale 5\n"
+                + "+Riga modificata 3\n"
+                + " Riga originale 6\n"
+                + " Riga originale 7\n"
+                + " Riga originale 8\n";
+        PatchParser patchParser = new PatchParser();
+        List<Patch> patches = patchParser.parseForPatches(inputText);
+        assertEquals(1,patches.size());
+
+    }
+    //error incorrect number of hunks: EXPECTED:1 Actual:2
+    @Test
+    public void testDiffPatchHunks() {
         String inputText = "Index: file1.txt\n"
                 +"===========================\n"
                 + "--- file1.txt\n"
@@ -135,27 +161,15 @@ public class PatchParserTest {
                 + "-Riga originale 3\n"
                 + "+Riga modificata 1\n"
                 + "+Riga modificata 2\n"
-                + "+Riga aggiunta 2.5\n"
-                + " Riga originale 4\n"
-                + "-Riga originale 5\n"
-                + "+Riga modificata 3\n"
-                + " Riga originale 6\n"
-                + " Riga originale 7\n"
-                + " Riga originale 8\n";
+                + "+Riga modificata 3\n";
 
         PatchParser patchParser = new PatchParser();
         List<Patch> patches = patchParser.parseForPatches(inputText);
-        assertEquals(2, patches.size());
+
 
         Patch patch = patches.get(0);
+        assertEquals(1,patch.getHunks().size());
 
-
-      assertEquals("\n This is a test.\n"
-              + "\n+Added line.\n"
-              + "\n \n" //Whitespace inside the hunk
-              + "\n More changes.\n"
-              + "\n-Removed line.\n"
-              + "\n The end.",patch.getHunks().get(0).getText().replaceAll("\r", ""));
     }
 
 
