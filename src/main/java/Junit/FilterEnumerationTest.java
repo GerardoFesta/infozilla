@@ -23,6 +23,12 @@ public class FilterEnumerationTest {
     }
 
     @Test
+    public void testGetWithoutEnums() {
+        String inputText = "Input senza enumeration";
+        List<Enumeration> charEnums = filterEnumeration.runFilter(inputText);
+        assertEquals(0, charEnums.size());
+    }
+    @Test
     public void testGetCharEnums() {
         String inputText = "A. Item 1\nB. Item 2\nC. Item 3";
         List<Enumeration> charEnums = filterEnumeration.runFilter(inputText);
@@ -194,7 +200,7 @@ public class FilterEnumerationTest {
     @Test
     //ERRORE: non salta l'elemento errato
     public void testRunFilter2NumEnumsAND3NumEnums() {
-        String inputText = "1. Item 1\n2. Item 2\nfghjItem\n1. Item 3\n2. Item 4\n3. Item 5";
+        String inputText = "1. Item 1\n2. Item 2\nNonFaParteDiEnum\n1. Item 3\n2. Item 4\n3. Item 5";
         List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
         assertEquals(2, enumerations.size());
 
