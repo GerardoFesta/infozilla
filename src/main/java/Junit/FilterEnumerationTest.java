@@ -75,24 +75,30 @@ public class FilterEnumerationTest {
         assertEquals("A. Item 1", enumeration.getEnumeration_items().get(0));
         assertEquals("B. Item 2", enumeration.getEnumeration_items().get(1));
         assertEquals("C. Item 3", enumeration.getEnumeration_items().get(2));
+        assertEquals(3, enumeration.getEnumeration_items().size());
+
         Enumeration enumeration1 = enumerations.get(1);
         assertEquals("- Item 4", enumeration1.getEnumeration_items().get(0));
         assertEquals("- Item 5", enumeration1.getEnumeration_items().get(1));
+        assertEquals(2, enumeration1.getEnumeration_items().size());
     }
 
     @Test
     public void testRunFilterCharEnumsANDNumEnums() {
-        String inputText = "A. Item 1\nB. Item 2\n1. Item 3\n2. Item 4\n2. Item 5";
+        String inputText = "A. Item 1\nB. Item 2\n1. Item 3\n2. Item 4\n3. Item 5";
         List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
         assertEquals(2, enumerations.size());
 
         Enumeration enumeration = enumerations.get(0);
         assertEquals("A. Item 1", enumeration.getEnumeration_items().get(0));
         assertEquals("B. Item 2", enumeration.getEnumeration_items().get(1));
+        assertEquals(2, enumeration.getEnumeration_items().size());
+
         Enumeration enumeration1 = enumerations.get(1);
         assertEquals("1. Item 3", enumeration1.getEnumeration_items().get(0));
         assertEquals("2. Item 4", enumeration1.getEnumeration_items().get(1));
-        assertEquals("2. Item 5", enumeration1.getEnumeration_items().get(2));
+        assertEquals("3. Item 5", enumeration1.getEnumeration_items().get(2));
+        assertEquals(3, enumeration1.getEnumeration_items().size());
     }
 
     @Test
@@ -106,9 +112,12 @@ public class FilterEnumerationTest {
         assertEquals("A. Item 1", enumeration.getEnumeration_items().get(0));
         assertEquals("B. Item 2", enumeration.getEnumeration_items().get(1));
         assertEquals("C. Item 3", enumeration.getEnumeration_items().get(2));
+        assertEquals(3, enumeration.getEnumeration_items().size());
+
         Enumeration enumeration1 = enumerations.get(1);
         assertEquals("A. Item 4", enumeration1.getEnumeration_items().get(0));
         assertEquals("B. Item 5", enumeration1.getEnumeration_items().get(1));
+        assertEquals(2, enumeration1.getEnumeration_items().size());
     }
 
     @Test
@@ -121,9 +130,12 @@ public class FilterEnumerationTest {
         Enumeration enumeration = enumerations.get(0);
         assertEquals("A. Item 1", enumeration.getEnumeration_items().get(0));
         assertEquals("B. Item 2", enumeration.getEnumeration_items().get(1));
+        assertEquals(2, enumeration.getEnumeration_items().size());
+
         Enumeration enumeration1 = enumerations.get(1);
         assertEquals("A. Item 3", enumeration1.getEnumeration_items().get(0));
         assertEquals("B. Item 4", enumeration1.getEnumeration_items().get(1));
+        assertEquals(2, enumeration1.getEnumeration_items().size());
     }
 
     @Test
@@ -136,15 +148,13 @@ public class FilterEnumerationTest {
         Enumeration enumeration = enumerations.get(0);
         assertEquals("A. Item 4", enumeration.getEnumeration_items().get(0));
         assertEquals("B. Item 5", enumeration.getEnumeration_items().get(1));
-        assertEquals("- Item 1", enumeration.getEnumeration_items().get(2));
-        assertEquals("- Item 2", enumeration.getEnumeration_items().get(3));
-        assertEquals("- Item 3", enumeration.getEnumeration_items().get(4));
+        assertEquals(2, enumeration.getEnumeration_items().size());
+
         Enumeration enumeration1 = enumerations.get(0);
-        assertEquals("A. Item 4", enumeration1.getEnumeration_items().get(0));
-        assertEquals("B. Item 5", enumeration1.getEnumeration_items().get(1));
-        assertEquals("- Item 1", enumeration1.getEnumeration_items().get(2));
-        assertEquals("- Item 2", enumeration1.getEnumeration_items().get(3));
-        assertEquals("- Item 3", enumeration1.getEnumeration_items().get(4));
+        assertEquals("- Item 1", enumeration1.getEnumeration_items().get(0));
+        assertEquals("- Item 2", enumeration1.getEnumeration_items().get(1));
+        assertEquals("- Item 3", enumeration1.getEnumeration_items().get(2));
+        assertEquals(2, enumeration1.getEnumeration_items().size());
 
     }
 
@@ -159,13 +169,12 @@ public class FilterEnumerationTest {
         Enumeration enumeration = enumerations.get(0);
         assertEquals("1. Item 1", enumeration.getEnumeration_items().get(0));
         assertEquals("2. Item 2", enumeration.getEnumeration_items().get(1));
-        assertEquals("- Item 3", enumeration.getEnumeration_items().get(2));
-        assertEquals("- Item 4", enumeration.getEnumeration_items().get(3));
+        assertEquals(2, enumeration.getEnumeration_items().size());
+
         Enumeration enumeration1 = enumerations.get(0);
-        assertEquals("1. Item 1", enumeration.getEnumeration_items().get(0));
-        assertEquals("2. Item 2", enumeration.getEnumeration_items().get(1));
-        assertEquals("- Item 3", enumeration.getEnumeration_items().get(2));
-        assertEquals("- Item 4", enumeration.getEnumeration_items().get(3));
+        assertEquals("- Item 3", enumeration1.getEnumeration_items().get(0));
+        assertEquals("- Item 4", enumeration1.getEnumeration_items().get(1));
+        assertEquals(2, enumeration1.getEnumeration_items().size());
     }
 
     @Test
@@ -175,23 +184,24 @@ public class FilterEnumerationTest {
         List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
         assertEquals(3, enumerations.size());
 
-        Enumeration enumeration1 = enumerations.get(0);
-        assertEquals("A. Item 1", enumeration1.getEnumeration_items().get(0));
-        assertEquals("B. Item 2", enumeration1.getEnumeration_items().get(1));
-        assertEquals("C. Item 3", enumeration1.getEnumeration_items().get(2));
-        assertEquals("1. Item 1", enumeration1.getEnumeration_items().get(3));
-        assertEquals("2. Item 2", enumeration1.getEnumeration_items().get(4));
-        assertEquals("3. Item 3", enumeration1.getEnumeration_items().get(5));
-        assertEquals("A. Item 1", enumeration1.getEnumeration_items().get(6));
-        assertEquals("B. Item 2", enumeration1.getEnumeration_items().get(7));
-        assertEquals("C. Item 3", enumeration1.getEnumeration_items().get(8));
-        Enumeration enumeration = enumerations.get(1);
-        assertEquals("1. Item 1", enumeration1.getEnumeration_items().get(3));
-        assertEquals("2. Item 2", enumeration1.getEnumeration_items().get(4));
-        assertEquals("3. Item 3", enumeration1.getEnumeration_items().get(5));
+        Enumeration enumeration = enumerations.get(0);
         assertEquals("A. Item 1", enumeration.getEnumeration_items().get(0));
         assertEquals("B. Item 2", enumeration.getEnumeration_items().get(1));
         assertEquals("C. Item 3", enumeration.getEnumeration_items().get(2));
+        assertEquals(3, enumeration.getEnumeration_items().size());
+
+        Enumeration enumeration1 = enumerations.get(0);
+        assertEquals("1. Item 1", enumeration1.getEnumeration_items().get(0));
+        assertEquals("2. Item 2", enumeration1.getEnumeration_items().get(1));
+        assertEquals("3. Item 3", enumeration1.getEnumeration_items().get(2));
+        assertEquals(3, enumeration1.getEnumeration_items().size());
+
+        Enumeration enumeration2 = enumerations.get(0);
+        assertEquals("A. Item 1", enumeration2.getEnumeration_items().get(0));
+        assertEquals("B. Item 2", enumeration2.getEnumeration_items().get(1));
+        assertEquals("C. Item 3", enumeration2.getEnumeration_items().get(2));
+        assertEquals(3, enumeration2.getEnumeration_items().size());
+
 
 
     }
@@ -207,41 +217,38 @@ public class FilterEnumerationTest {
         assertEquals("1. Item 1", enumeration.getEnumeration_items().get(0));
         assertEquals("2. Item 2", enumeration.getEnumeration_items().get(1));
         assertEquals("3. Item 3", enumeration.getEnumeration_items().get(2));
+        assertEquals(3, enumeration.getEnumeration_items().size());
+
         Enumeration enumeration1 = enumerations.get(1);
         assertEquals("1. Item 4", enumeration1.getEnumeration_items().get(0));
         assertEquals("2. Item 5", enumeration1.getEnumeration_items().get(1));
+        assertEquals(2, enumeration1.getEnumeration_items().size());
     }
 
     @Test
     //ERRORE: nella prima inserisce tutto, nella seconda il secondo e l'ultimo, nella terza solo l'ultimo. (devono essere sempre in orinde char/num/-
     public void testRunFilterCharEnumsANDNumEnumsANDItemizations() {
-        String inputText = "A. Item 1\nB. Item 2\n1. Item 1\n2. Item 2\n3. Item 3\n- Item 1\n- Item 2\n- Item 3";
+        String inputText = "A. Item 1\nB. Item 2\ntesto\n1. Item 1\n2. Item 2\n3. Item 3\n- Item 1\n- Item 2\n- Item 3";
         List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
         assertEquals(3, enumerations.size());
 
         Enumeration enumeration = enumerations.get(0);
         assertEquals("A. Item 1", enumeration.getEnumeration_items().get(0));
         assertEquals("B. Item 2", enumeration.getEnumeration_items().get(1));
-        assertEquals("1. Item 1", enumeration.getEnumeration_items().get(2));
-        assertEquals("2. Item 2", enumeration.getEnumeration_items().get(3));
-        assertEquals("3. Item 3", enumeration.getEnumeration_items().get(4));
-        assertEquals("- Item 1", enumeration.getEnumeration_items().get(5));
-        assertEquals("- Item 2", enumeration.getEnumeration_items().get(6));
-        assertEquals("- Item 3", enumeration.getEnumeration_items().get(7));
+        assertEquals(2, enumeration.getEnumeration_items().size());
 
         Enumeration enumeration2 = enumerations.get(1);
 
         assertEquals("1. Item 1", enumeration2.getEnumeration_items().get(0));
         assertEquals("2. Item 2", enumeration2.getEnumeration_items().get(1));
         assertEquals("3. Item 3", enumeration2.getEnumeration_items().get(2));
-        assertEquals("- Item 1", enumeration2.getEnumeration_items().get(3));
-        assertEquals("- Item 2", enumeration2.getEnumeration_items().get(4));
-        assertEquals("- Item 3", enumeration2.getEnumeration_items().get(5));
+        assertEquals(3, enumeration2.getEnumeration_items().size());
 
         Enumeration enumeration3 = enumerations.get(2);
         assertEquals("- Item 1", enumeration3.getEnumeration_items().get(0));
         assertEquals("- Item 2", enumeration3.getEnumeration_items().get(1));
         assertEquals("- Item 3", enumeration3.getEnumeration_items().get(2));
+        assertEquals(3, enumeration3.getEnumeration_items().size());
 
     }
 
