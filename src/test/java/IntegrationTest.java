@@ -16,7 +16,7 @@ public class IntegrationTest {
     private FilterSourceCodeJAVA sourcecodeFilter;
     private FilterEnumeration enumFilter;
 
-    private String inputText ="if (isJavaProject) {\n"
+    private String inputText = "if (isJavaProject) {\n"
             + "IJavaProject jProject = JavaCore.create(project);\n"
             + "jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(), monitor);\n"
             + "modelIds.add(model.getPluginBase().getId());\n"
@@ -28,7 +28,7 @@ public class IntegrationTest {
             + "at org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)\n"
             + "at org.eclipse.core.internal.resources.File.getContents(File.java:213)\n"
             + "at org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)\n"
-            +"Index: file_modificato.txt\n"
+            + "Index: file_modificato.txt\n"
             + "===================================================================\n"
             + "--- file_modificato.txt\t(revision 123)\n"
             + "+++ file_modificato.txt\t(revision 124)\n"
@@ -47,7 +47,7 @@ public class IntegrationTest {
 
     @Test
     public void tcTraceSource() {
-        FilterChainEclipse filterChain = new FilterChainEclipse(inputText, false , true, true, false);
+        FilterChainEclipse filterChain = new FilterChainEclipse(inputText, false, true, true, false);
         List<Patch> patches = filterChain.getPatches();
         List<StackTrace> traces = filterChain.getTraces();
         List<CodeRegion> regions = filterChain.getRegions();
@@ -61,43 +61,42 @@ public class IntegrationTest {
         assertFalse(regions.isEmpty());
 
         //source
-        assertEquals(1,regions.size());
+        assertEquals(1, regions.size());
         assertEquals("if (isJavaProject) {\n"
                 + "IJavaProject jProject = JavaCore.create(project);\n"
                 + "jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(), monitor);\n"
                 + "modelIds.add(model.getPluginBase().getId());\n"
-                + "}",regions.get(0).text);
+                + "}", regions.get(0).text);
 
         //trace
-        assertEquals(1,traces.size());
-        assertEquals("org.eclipse.core.internal.resources.ResourceException",traces.get(0).getException());
-        assertEquals(":\n"+"Resource /org.eclipse.debug.core/.classpath is not local.",traces.get(0).getReason());
-        assertEquals("org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)",traces.get(0).getFrames().get(0));
-        assertEquals("org.eclipse.core.internal.resources.File.getContents(File.java:213)",traces.get(0).getFrames().get(1));
-        assertEquals("org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)",traces.get(0).getFrames().get(2));
+        assertEquals(1, traces.size());
+        assertEquals("org.eclipse.core.internal.resources.ResourceException", traces.get(0).getException());
+        assertEquals(":\n" + "Resource /org.eclipse.debug.core/.classpath is not local.", traces.get(0).getReason());
+        assertEquals("org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)", traces.get(0).getFrames().get(0));
+        assertEquals("org.eclipse.core.internal.resources.File.getContents(File.java:213)", traces.get(0).getFrames().get(1));
+        assertEquals("org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)", traces.get(0).getFrames().get(2));
 
-         outputText ="\n1) perform the import in only one operation as suggested by bug 31592\n"
-                 + "2) add a temporary .classpth to the project to avoid markers creation while\n\n"
-                 +"Index: file_modificato.txt\n"
-                 + "===================================================================\n"
-                 + "--- file_modificato.txt\t(revision 123)\n"
-                 + "+++ file_modificato.txt\t(revision 124)\n"
-                 + "@@ -1,6 +1,6 @@\n"
-                 + " Riga originale 1\n"
-                 + " Riga originale 2\n"
-                 + " Riga originale 3\n"
-                 + "+Riga modificata 1\n"
-                 + "+Riga modificata 2\n"
-                 + "+Riga aggiunta 2.5\n"
-                 + " Riga originale 4\n"
-                 + "-Riga originale 5\n"
-                 + "+Riga modificata 3\n"
-                 + " Riga originale 6\n";
+        outputText = "\n1) perform the import in only one operation as suggested by bug 31592\n"
+                + "2) add a temporary .classpth to the project to avoid markers creation while\n\n"
+                + "Index: file_modificato.txt\n"
+                + "===================================================================\n"
+                + "--- file_modificato.txt\t(revision 123)\n"
+                + "+++ file_modificato.txt\t(revision 124)\n"
+                + "@@ -1,6 +1,6 @@\n"
+                + " Riga originale 1\n"
+                + " Riga originale 2\n"
+                + " Riga originale 3\n"
+                + "+Riga modificata 1\n"
+                + "+Riga modificata 2\n"
+                + "+Riga aggiunta 2.5\n"
+                + " Riga originale 4\n"
+                + "-Riga originale 5\n"
+                + "+Riga modificata 3\n"
+                + " Riga originale 6\n";
 
-        assertEquals(outputText,filterChain.getOutputText());
+        assertEquals(outputText, filterChain.getOutputText());
 
     }
-
 
 
     @Test
@@ -116,24 +115,24 @@ public class IntegrationTest {
 
 
         //enumerations
-        assertEquals(1,enumerations.size());
-        assertEquals("1) perform the import in only one operation as suggested by bug 31592",enumerations.get(0).getEnumeration_items().get(0));
-        assertEquals("2) add a temporary .classpth to the project to avoid markers creation while",enumerations.get(0).getEnumeration_items().get(1));
+        assertEquals(1, enumerations.size());
+        assertEquals("1) perform the import in only one operation as suggested by bug 31592", enumerations.get(0).getEnumeration_items().get(0));
+        assertEquals("2) add a temporary .classpth to the project to avoid markers creation while", enumerations.get(0).getEnumeration_items().get(1));
 
         //trace
-        assertEquals(1,traces.size());
-        assertEquals("org.eclipse.core.internal.resources.ResourceException",traces.get(0).getException());
-        assertEquals(":\n"+"Resource /org.eclipse.debug.core/.classpath is not local.",traces.get(0).getReason());
-        assertEquals("org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)",traces.get(0).getFrames().get(0));
-        assertEquals("org.eclipse.core.internal.resources.File.getContents(File.java:213)",traces.get(0).getFrames().get(1));
-        assertEquals("org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)",traces.get(0).getFrames().get(2));
+        assertEquals(1, traces.size());
+        assertEquals("org.eclipse.core.internal.resources.ResourceException", traces.get(0).getException());
+        assertEquals(":\n" + "Resource /org.eclipse.debug.core/.classpath is not local.", traces.get(0).getReason());
+        assertEquals("org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)", traces.get(0).getFrames().get(0));
+        assertEquals("org.eclipse.core.internal.resources.File.getContents(File.java:213)", traces.get(0).getFrames().get(1));
+        assertEquals("org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)", traces.get(0).getFrames().get(2));
 
-        outputText ="if (isJavaProject) {\n"
+        outputText = "if (isJavaProject) {\n"
                 + "IJavaProject jProject = JavaCore.create(project);\n"
                 + "jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(), monitor);\n"
                 + "modelIds.add(model.getPluginBase().getId());\n"
                 + "}\n\n\n\n"
-                +"Index: file_modificato.txt\n"
+                + "Index: file_modificato.txt\n"
                 + "===================================================================\n"
                 + "--- file_modificato.txt\t(revision 123)\n"
                 + "+++ file_modificato.txt\t(revision 124)\n"
@@ -149,7 +148,7 @@ public class IntegrationTest {
                 + "+Riga modificata 3\n"
                 + " Riga originale 6\n";
 
-        assertEquals(outputText,filterChain.getOutputText());
+        assertEquals(outputText, filterChain.getOutputText());
 
     }
 
@@ -170,23 +169,23 @@ public class IntegrationTest {
         assertTrue(regions.isEmpty());
 
         //patch
-        assertEquals(1,patches.size());
-        assertEquals("file_modificato.txt",patches.get(0).getOriginalFile());
-        assertEquals("file_modificato.txt",patches.get(0).getModifiedFile());
-        assertEquals("file_modificato.txt",patches.get(0).getIndex());
-        assertEquals(1,patches.get(0).getHunks().size());
-        assertEquals(" Riga originale 1"+" Riga originale 2"+ " Riga originale 3"+"+Riga modificata 1"+"+Riga modificata 2"+"+Riga aggiunta 2.5"+ " Riga originale 4"+ "-Riga originale 5"+ "+Riga modificata 3"+" Riga originale 6"
-                ,patches.get(0).getHunks().get(0).getText().replaceAll("\r", "").replaceAll("\n",""));
+        assertEquals(1, patches.size());
+        assertEquals("file_modificato.txt", patches.get(0).getOriginalFile());
+        assertEquals("file_modificato.txt", patches.get(0).getModifiedFile());
+        assertEquals("file_modificato.txt", patches.get(0).getIndex());
+        assertEquals(1, patches.get(0).getHunks().size());
+        assertEquals(" Riga originale 1" + " Riga originale 2" + " Riga originale 3" + "+Riga modificata 1" + "+Riga modificata 2" + "+Riga aggiunta 2.5" + " Riga originale 4" + "-Riga originale 5" + "+Riga modificata 3" + " Riga originale 6"
+                , patches.get(0).getHunks().get(0).getText().replaceAll("\r", "").replaceAll("\n", ""));
 
         //trace
-        assertEquals(1,traces.size());
-        assertEquals("org.eclipse.core.internal.resources.ResourceException",traces.get(0).getException());
-        assertEquals(":\n"+"Resource /org.eclipse.debug.core/.classpath is not local.",traces.get(0).getReason());
-        assertEquals("org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)",traces.get(0).getFrames().get(0));
-        assertEquals("org.eclipse.core.internal.resources.File.getContents(File.java:213)",traces.get(0).getFrames().get(1));
-        assertEquals("org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)",traces.get(0).getFrames().get(2));
+        assertEquals(1, traces.size());
+        assertEquals("org.eclipse.core.internal.resources.ResourceException", traces.get(0).getException());
+        assertEquals(":\n" + "Resource /org.eclipse.debug.core/.classpath is not local.", traces.get(0).getReason());
+        assertEquals("org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)", traces.get(0).getFrames().get(0));
+        assertEquals("org.eclipse.core.internal.resources.File.getContents(File.java:213)", traces.get(0).getFrames().get(1));
+        assertEquals("org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)", traces.get(0).getFrames().get(2));
 
-        outputText ="if (isJavaProject) {\n"
+        outputText = "if (isJavaProject) {\n"
                 + "IJavaProject jProject = JavaCore.create(project);\n"
                 + "jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(), monitor);\n"
                 + "modelIds.add(model.getPluginBase().getId());\n"
@@ -194,15 +193,14 @@ public class IntegrationTest {
                 + "1) perform the import in only one operation as suggested by bug 31592\n"
                 + "2) add a temporary .classpth to the project to avoid markers creation while\n\n\n";
 
-        assertEquals(outputText,filterChain.getOutputText());
+        assertEquals(outputText, filterChain.getOutputText());
 
 
     }
 
 
-
     @Test
-    public void tcSourcePatch(){
+    public void tcSourcePatch() {
 
         FilterChainEclipse filterChain = new FilterChainEclipse(inputText, true, false, true, false);
         List<Patch> patches = filterChain.getPatches();
@@ -218,24 +216,24 @@ public class IntegrationTest {
         assertFalse(regions.isEmpty());
 
         //patch
-        assertEquals(1,patches.size());
-        assertEquals("file_modificato.txt",patches.get(0).getOriginalFile());
-        assertEquals("file_modificato.txt",patches.get(0).getModifiedFile());
-        assertEquals("file_modificato.txt",patches.get(0).getIndex());
-        assertEquals(1,patches.get(0).getHunks().size());
-        assertEquals(" Riga originale 1"+" Riga originale 2"+ " Riga originale 3"+"+Riga modificata 1"+"+Riga modificata 2"+"+Riga aggiunta 2.5"+ " Riga originale 4"+ "-Riga originale 5"+ "+Riga modificata 3"+" Riga originale 6"
-                ,patches.get(0).getHunks().get(0).getText().replaceAll("\r", "").replaceAll("\n",""));
+        assertEquals(1, patches.size());
+        assertEquals("file_modificato.txt", patches.get(0).getOriginalFile());
+        assertEquals("file_modificato.txt", patches.get(0).getModifiedFile());
+        assertEquals("file_modificato.txt", patches.get(0).getIndex());
+        assertEquals(1, patches.get(0).getHunks().size());
+        assertEquals(" Riga originale 1" + " Riga originale 2" + " Riga originale 3" + "+Riga modificata 1" + "+Riga modificata 2" + "+Riga aggiunta 2.5" + " Riga originale 4" + "-Riga originale 5" + "+Riga modificata 3" + " Riga originale 6"
+                , patches.get(0).getHunks().get(0).getText().replaceAll("\r", "").replaceAll("\n", ""));
 
         //source
-        assertEquals(1,regions.size());
+        assertEquals(1, regions.size());
         assertEquals("if (isJavaProject) {\n"
                 + "IJavaProject jProject = JavaCore.create(project);\n"
                 + "jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(), monitor);\n"
                 + "modelIds.add(model.getPluginBase().getId());\n"
-                + "}",regions.get(0).text);
+                + "}", regions.get(0).text);
 
 
-        outputText ="\n1) perform the import in only one operation as suggested by bug 31592\n"
+        outputText = "\n1) perform the import in only one operation as suggested by bug 31592\n"
                 + "2) add a temporary .classpth to the project to avoid markers creation while\n"
                 + "org.eclipse.core.internal.resources.ResourceException:\n"
                 + "Resource /org.eclipse.debug.core/.classpath is not local.\n"
@@ -243,10 +241,301 @@ public class IntegrationTest {
                 + "at org.eclipse.core.internal.resources.File.getContents(File.java:213)\n"
                 + "at org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)\n\n";
 
-        assertEquals(outputText,filterChain.getOutputText());
+        assertEquals(outputText, filterChain.getOutputText());
+
+    }
+
+    @Test
+    public void tcSourceEnum() {
+        FilterChainEclipse filterChain = new FilterChainEclipse(inputText, false, false, true, true);
+        List<Patch> patches = filterChain.getPatches();
+        List<StackTrace> traces = filterChain.getTraces();
+        List<CodeRegion> regions = filterChain.getRegions();
+        List<Enumeration> enumerations = filterChain.getEnumerations();
+
+        // Verifica che le liste non siano nulle
+        assertTrue(patches.isEmpty());
+        assertFalse(enumerations.isEmpty());
+
+        assertTrue(traces.isEmpty());
+        assertFalse(regions.isEmpty());
+
+
+        //enumerations
+        assertEquals(1, enumerations.size());
+        assertEquals("1) perform the import in only one operation as suggested by bug 31592", enumerations.get(0).getEnumeration_items().get(0));
+        assertEquals("2) add a temporary .classpth to the project to avoid markers creation while", enumerations.get(0).getEnumeration_items().get(1));
+
+        //source
+        assertEquals(1, regions.size());
+        assertEquals("if (isJavaProject) {\n"
+                + "IJavaProject jProject = JavaCore.create(project);\n"
+                + "jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(), monitor);\n"
+                + "modelIds.add(model.getPluginBase().getId());\n"
+                + "}", regions.get(0).text);
+
+        outputText = "\n\n\norg.eclipse.core.internal.resources.ResourceException:\n"
+                + "Resource /org.eclipse.debug.core/.classpath is not local.\n"
+                + "at org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)\n"
+                + "at org.eclipse.core.internal.resources.File.getContents(File.java:213)\n"
+                + "at org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)\n"
+                + "Index: file_modificato.txt\n"
+                + "===================================================================\n"
+                + "--- file_modificato.txt\t(revision 123)\n"
+                + "+++ file_modificato.txt\t(revision 124)\n"
+                + "@@ -1,6 +1,6 @@\n"
+                + " Riga originale 1\n"
+                + " Riga originale 2\n"
+                + " Riga originale 3\n"
+                + "+Riga modificata 1\n"
+                + "+Riga modificata 2\n"
+                + "+Riga aggiunta 2.5\n"
+                + " Riga originale 4\n"
+                + "-Riga originale 5\n"
+                + "+Riga modificata 3\n"
+                + " Riga originale 6\n";
+
+        assertEquals(outputText, filterChain.getOutputText());
+
+    }
+
+    @Test
+    public void tcPatchEnum() {
+        FilterChainEclipse filterChain = new FilterChainEclipse(inputText, true, false, false, true);
+        List<Patch> patches = filterChain.getPatches();
+        List<StackTrace> traces = filterChain.getTraces();
+        List<CodeRegion> regions = filterChain.getRegions();
+        List<Enumeration> enumerations = filterChain.getEnumerations();
+
+        // Verifica che le liste non siano nulle
+        assertFalse(patches.isEmpty());
+        assertFalse(enumerations.isEmpty());
+
+        assertTrue(traces.isEmpty());
+        assertTrue(regions.isEmpty());
+
+        //patch
+        assertEquals(1, patches.size());
+        assertEquals("file_modificato.txt", patches.get(0).getOriginalFile());
+        assertEquals("file_modificato.txt", patches.get(0).getModifiedFile());
+        assertEquals("file_modificato.txt", patches.get(0).getIndex());
+        assertEquals(1, patches.get(0).getHunks().size());
+        assertEquals(" Riga originale 1" + " Riga originale 2" + " Riga originale 3" + "+Riga modificata 1" + "+Riga modificata 2" + "+Riga aggiunta 2.5" + " Riga originale 4" + "-Riga originale 5" + "+Riga modificata 3" + " Riga originale 6"
+                , patches.get(0).getHunks().get(0).getText().replaceAll("\r", "").replaceAll("\n", ""));
+
+        //enumerations
+        assertEquals(1, enumerations.size());
+        assertEquals("1) perform the import in only one operation as suggested by bug 31592", enumerations.get(0).getEnumeration_items().get(0));
+        assertEquals("2) add a temporary .classpth to the project to avoid markers creation while", enumerations.get(0).getEnumeration_items().get(1));
+
+        assertEquals("if (isJavaProject) {\n"
+                + "IJavaProject jProject = JavaCore.create(project);\n"
+                + "jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(), monitor);\n"
+                + "modelIds.add(model.getPluginBase().getId());\n"
+                + "}\n\n\n" + "org.eclipse.core.internal.resources.ResourceException:\n"
+                + "Resource /org.eclipse.debug.core/.classpath is not local.\n"
+                + "at org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)\n"
+                + "at org.eclipse.core.internal.resources.File.getContents(File.java:213)\n"
+                + "at org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)\n\n", filterChain.getOutputText().replaceAll("\r", ""));
+    }
+
+    @Test
+    public void tcPatchTraceSource() {
+        FilterChainEclipse filterChain = new FilterChainEclipse(inputText, true, true, true, false);
+        List<Patch> patches = filterChain.getPatches();
+        List<StackTrace> traces = filterChain.getTraces();
+        List<CodeRegion> regions = filterChain.getRegions();
+        List<Enumeration> enumerations = filterChain.getEnumerations();
+
+        // Verifica che le liste non siano nulle
+        assertFalse(patches.isEmpty());
+        assertTrue(enumerations.isEmpty());
+
+        assertFalse(traces.isEmpty());
+        assertFalse(regions.isEmpty());
+
+        //patch
+        assertEquals(1, patches.size());
+        assertEquals("file_modificato.txt", patches.get(0).getOriginalFile());
+        assertEquals("file_modificato.txt", patches.get(0).getModifiedFile());
+        assertEquals("file_modificato.txt", patches.get(0).getIndex());
+        assertEquals(1, patches.get(0).getHunks().size());
+        assertEquals(" Riga originale 1" + " Riga originale 2" + " Riga originale 3" + "+Riga modificata 1" + "+Riga modificata 2" + "+Riga aggiunta 2.5" + " Riga originale 4" + "-Riga originale 5" + "+Riga modificata 3" + " Riga originale 6"
+                , patches.get(0).getHunks().get(0).getText().replaceAll("\r", "").replaceAll("\n", ""));
+
+
+        //source
+        assertEquals(1, regions.size());
+        assertEquals("if (isJavaProject) {\n"
+                + "IJavaProject jProject = JavaCore.create(project);\n"
+                + "jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(), monitor);\n"
+                + "modelIds.add(model.getPluginBase().getId());\n"
+                + "}", regions.get(0).text);
+
+        //trace
+        assertEquals(1, traces.size());
+        assertEquals("org.eclipse.core.internal.resources.ResourceException", traces.get(0).getException());
+        assertEquals(":\n" + "Resource /org.eclipse.debug.core/.classpath is not local.", traces.get(0).getReason());
+        assertEquals("org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)", traces.get(0).getFrames().get(0));
+        assertEquals("org.eclipse.core.internal.resources.File.getContents(File.java:213)", traces.get(0).getFrames().get(1));
+        assertEquals("org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)", traces.get(0).getFrames().get(2));
+
+
+        assertEquals("\n1) perform the import in only one operation as suggested by bug 31592\n"
+                + "2) add a temporary .classpth to the project to avoid markers creation while\n\n\n", filterChain.getOutputText().replaceAll("\r", ""));
+    }
+
+
+    @Test
+    public void tcPatchSourceEnum() {
+        FilterChainEclipse filterChain = new FilterChainEclipse(inputText, true, false, true, true);
+        List<Patch> patches = filterChain.getPatches();
+        List<StackTrace> traces = filterChain.getTraces();
+        List<CodeRegion> regions = filterChain.getRegions();
+        List<Enumeration> enumerations = filterChain.getEnumerations();
+
+        // Verifica che le liste non siano nulle
+        assertFalse(patches.isEmpty());
+        assertFalse(enumerations.isEmpty());
+
+        assertTrue(traces.isEmpty());
+        assertFalse(regions.isEmpty());
+
+        //patch
+        assertEquals(1, patches.size());
+        assertEquals("file_modificato.txt", patches.get(0).getOriginalFile());
+        assertEquals("file_modificato.txt", patches.get(0).getModifiedFile());
+        assertEquals("file_modificato.txt", patches.get(0).getIndex());
+        assertEquals(1, patches.get(0).getHunks().size());
+        assertEquals(" Riga originale 1" + " Riga originale 2" + " Riga originale 3" + "+Riga modificata 1" + "+Riga modificata 2" + "+Riga aggiunta 2.5" + " Riga originale 4" + "-Riga originale 5" + "+Riga modificata 3" + " Riga originale 6"
+                , patches.get(0).getHunks().get(0).getText().replaceAll("\r", "").replaceAll("\n", ""));
+
+        //enumerations
+        assertEquals(1, enumerations.size());
+        assertEquals("1) perform the import in only one operation as suggested by bug 31592", enumerations.get(0).getEnumeration_items().get(0));
+        assertEquals("2) add a temporary .classpth to the project to avoid markers creation while", enumerations.get(0).getEnumeration_items().get(1));
+
+        //source
+        assertEquals(1, regions.size());
+        assertEquals("if (isJavaProject) {\n"
+                + "IJavaProject jProject = JavaCore.create(project);\n"
+                + "jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(), monitor);\n"
+                + "modelIds.add(model.getPluginBase().getId());\n"
+                + "}", regions.get(0).text);
+
+
+        assertEquals("\n\n\norg.eclipse.core.internal.resources.ResourceException:\n"
+                + "Resource /org.eclipse.debug.core/.classpath is not local.\n"
+                + "at org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)\n"
+                + "at org.eclipse.core.internal.resources.File.getContents(File.java:213)\n"
+                + "at org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)\n\n", filterChain.getOutputText().replaceAll("\r", ""));
 
     }
 
 
+    @Test
+    public void tcTraceSourceEnum() {
+        FilterChainEclipse filterChain = new FilterChainEclipse(inputText, false, true, true, true);
+        List<Patch> patches = filterChain.getPatches();
+        List<StackTrace> traces = filterChain.getTraces();
+        List<CodeRegion> regions = filterChain.getRegions();
+        List<Enumeration> enumerations = filterChain.getEnumerations();
 
+        // Verifica che le liste non siano nulle
+        assertTrue(patches.isEmpty());
+        assertFalse(enumerations.isEmpty());
+
+        assertFalse(traces.isEmpty());
+        assertFalse(regions.isEmpty());
+
+        //enumerations
+        assertEquals(1, enumerations.size());
+        assertEquals("1) perform the import in only one operation as suggested by bug 31592", enumerations.get(0).getEnumeration_items().get(0));
+        assertEquals("2) add a temporary .classpth to the project to avoid markers creation while", enumerations.get(0).getEnumeration_items().get(1));
+
+        //source
+        assertEquals(1, regions.size());
+        assertEquals("if (isJavaProject) {\n"
+                + "IJavaProject jProject = JavaCore.create(project);\n"
+                + "jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(), monitor);\n"
+                + "modelIds.add(model.getPluginBase().getId());\n"
+                + "}", regions.get(0).text);
+
+        //trace
+        assertEquals(1, traces.size());
+        assertEquals("org.eclipse.core.internal.resources.ResourceException", traces.get(0).getException());
+        assertEquals(":\n" + "Resource /org.eclipse.debug.core/.classpath is not local.", traces.get(0).getReason());
+        assertEquals("org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)", traces.get(0).getFrames().get(0));
+        assertEquals("org.eclipse.core.internal.resources.File.getContents(File.java:213)", traces.get(0).getFrames().get(1));
+        assertEquals("org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)", traces.get(0).getFrames().get(2));
+
+
+        assertEquals("\n\n\n\nIndex: file_modificato.txt\n"
+                + "===================================================================\n"
+                + "--- file_modificato.txt\t(revision 123)\n"
+                + "+++ file_modificato.txt\t(revision 124)\n"
+                + "@@ -1,6 +1,6 @@\n"
+                + " Riga originale 1\n"
+                + " Riga originale 2\n"
+                + " Riga originale 3\n"
+                + "+Riga modificata 1\n"
+                + "+Riga modificata 2\n"
+                + "+Riga aggiunta 2.5\n"
+                + " Riga originale 4\n"
+                + "-Riga originale 5\n"
+                + "+Riga modificata 3\n"
+                + " Riga originale 6\n", filterChain.getOutputText().replaceAll("\r", ""));
+    }
+
+
+    @Test
+    public void tcComplete() {
+
+        FilterChainEclipse filterChain = new FilterChainEclipse(inputText, true, true, true, true);
+        List<Patch> patches = filterChain.getPatches();
+        List<StackTrace> traces = filterChain.getTraces();
+        List<CodeRegion> regions = filterChain.getRegions();
+        List<Enumeration> enumerations = filterChain.getEnumerations();
+
+        // Verifica che le liste non siano nulle
+        assertFalse(patches.isEmpty());
+        assertFalse(enumerations.isEmpty());
+
+        assertFalse(traces.isEmpty());
+        assertFalse(regions.isEmpty());
+
+        //patch
+        assertEquals(1, patches.size());
+        assertEquals("file_modificato.txt", patches.get(0).getOriginalFile());
+        assertEquals("file_modificato.txt", patches.get(0).getModifiedFile());
+        assertEquals("file_modificato.txt", patches.get(0).getIndex());
+        assertEquals(1, patches.get(0).getHunks().size());
+        assertEquals(" Riga originale 1" + " Riga originale 2" + " Riga originale 3" + "+Riga modificata 1" + "+Riga modificata 2" + "+Riga aggiunta 2.5" + " Riga originale 4" + "-Riga originale 5" + "+Riga modificata 3" + " Riga originale 6"
+                , patches.get(0).getHunks().get(0).getText().replaceAll("\r", "").replaceAll("\n", ""));
+
+        //enumerations
+        assertEquals(1, enumerations.size());
+        assertEquals("1) perform the import in only one operation as suggested by bug 31592", enumerations.get(0).getEnumeration_items().get(0));
+        assertEquals("2) add a temporary .classpth to the project to avoid markers creation while", enumerations.get(0).getEnumeration_items().get(1));
+
+        //source
+        assertEquals(1, regions.size());
+        assertEquals("if (isJavaProject) {\n"
+                + "IJavaProject jProject = JavaCore.create(project);\n"
+                + "jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(), monitor);\n"
+                + "modelIds.add(model.getPluginBase().getId());\n"
+                + "}", regions.get(0).text);
+
+        //trace
+        assertEquals(1, traces.size());
+        assertEquals("org.eclipse.core.internal.resources.ResourceException", traces.get(0).getException());
+        assertEquals(":\n" + "Resource /org.eclipse.debug.core/.classpath is not local.", traces.get(0).getReason());
+        assertEquals("org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)", traces.get(0).getFrames().get(0));
+        assertEquals("org.eclipse.core.internal.resources.File.getContents(File.java:213)", traces.get(0).getFrames().get(1));
+        assertEquals("org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)", traces.get(0).getFrames().get(2));
+
+        assertEquals("", filterChain.getOutputText().replaceAll("\n", ""));
+
+
+    }
 }
