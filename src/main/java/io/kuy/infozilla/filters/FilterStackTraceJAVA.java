@@ -5,6 +5,7 @@
 package io.kuy.infozilla.filters;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -34,7 +35,6 @@ public class FilterStackTraceJAVA implements IFilter{
 	 */
 	private List<MatchResult> findStackTraces(CharSequence s) {
 		List<MatchResult> stacktraces = new ArrayList<MatchResult>();
-		
 		for (MatchResult r : RegExHelper.findMatches(pattern_stacktrace_java, s)) {
 			stacktraces.add(r);			
 		}
@@ -42,6 +42,7 @@ public class FilterStackTraceJAVA implements IFilter{
 		for (MatchResult r: RegExHelper.findMatches(pattern_cause_java, s)) {
 			stacktraces.add(r);
 		}
+
 		return stacktraces;
 	}
 	
@@ -260,6 +261,32 @@ public class FilterStackTraceJAVA implements IFilter{
 		textRemover = new FilterTextRemover(inputText);
 		// Get a Bunch of Stack Traces
 		List<StackTrace> foundStackTraces = getStackTraces(inputText);
+
+		for (int i = 0; i < foundStackTraces.size(); i++) {
+			StackTrace trace1 = foundStackTraces.get(i);
+			for (int j = i + 1; j < foundStackTraces.size(); j++) {
+				StackTrace trace2 = foundStackTraces.get(j);
+				if (trace1.getException().equals(trace2.getException()) &&
+						trace1.getFramesText().equals(trace2.getFramesText()) &&
+						trace1.getReason().equals(trace2.getReason())) {
+					if (trace1.isCause() && !trace2.isCause()) {
+						// Imposta isCause su true per l'oggetto con indice minore
+						trace2.setCause(true);
+						// Rimuovi l'oggetto con indice maggiore
+						foundStackTraces.remove(j);
+						j--; // Decrementa j perché abbiamo rimosso un elemento dalla lista
+					} else if (!trace1.isCause() && trace2.isCause()) {
+						// Imposta isCause su true per l'oggetto con indice minore
+						trace1.setCause(true);
+						// Rimuovi l'oggetto con indice maggiore
+						foundStackTraces.remove(j);
+						j--; // Decrementa j perché abbiamo rimosso un elemento dalla lista
+					}
+				}
+			}
+		}
+
+
 		
 		// Do the removal in the textRemover
 		// ==> This is already done in getStackTraces when a MatchResult is present!
