@@ -152,7 +152,7 @@ public class FilterEnumeration implements IFilter {
 					// Reset the counters
 					enumStart = i;
 					enumEnd = -1;
-					symbolCount = 0;
+					symbolCount = 1;
 				}
 
 				lastFoundEnumSymbol = foundEnumSymbol;
@@ -237,7 +237,7 @@ public class FilterEnumeration implements IFilter {
 					// Reset the counters
 					enumStart = i;
 					enumEnd = -1;
-					symbolCount = 0;
+					symbolCount = 1;
 				}
 
 				lastFoundEnumSymbol = foundEnumSymbol;
