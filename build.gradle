@@ -22,6 +22,7 @@ test {
 }
 
 dependencies {
+  implementation 'org.json:json:20230227'
   implementation 'info.picocli:picocli:3.9.1'
   implementation 'org.ostermiller:utils:1.07.00'
   implementation 'mysql:mysql-connector-java:8.0.28'

@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 import io.kuy.infozilla.elements.enumeration.Enumeration;
 import io.kuy.infozilla.elements.patch.Patch;
@@ -233,8 +235,137 @@ public class DataExportUtility {
 		
 		return rootE;
 	}
-	
-	
+
+	//JSON
+
+	public static final JSONObject getJSONExportOfStackTraces(List<StackTrace> traces, boolean withFrames, Timestamp ts) {
+		JSONObject rootJSON = new JSONObject();
+		rootJSON.put("amount", traces.size());
+
+		JSONArray stackTracesArray = new JSONArray();
+
+		for (StackTrace trace : traces) {
+			JSONObject traceJSON = new JSONObject();
+
+			if (trace.isCause()) {
+				traceJSON.put("type", "Cause");
+			} else {
+				traceJSON.put("type", "Stacktrace");
+			}
+
+			traceJSON.put("timestamp", ts.getTime());
+			traceJSON.put("Exception", trace.getException());
+			traceJSON.put("Reason", trace.getReason());
+
+			if (withFrames) {
+				JSONArray framesArray = new JSONArray();
+				int depth = 0;
+				for (String frame : trace.getFrames()) {
+					JSONObject frameJSON = new JSONObject();
+					frameJSON.put("depth", depth);
+					frameJSON.put("frame", frame);
+					framesArray.put(frameJSON);
+					depth++;
+				}
+				traceJSON.put("Frames", framesArray);
+			}
+
+			stackTracesArray.put(traceJSON);
+		}
+
+		rootJSON.put("Stacktraces", stackTracesArray);
+
+		return rootJSON;
+	}
+
+
+	public static final JSONObject getJSONExportOfEnumerations(List<Enumeration> enumerations, boolean withLines) {
+		JSONObject rootJSON = new JSONObject();
+		rootJSON.put("amount", enumerations.size());
+
+		JSONArray enumerationsArray = new JSONArray();
+
+		for (Enumeration enu : enumerations) {
+			JSONObject enumJSON = new JSONObject();
+			enumJSON.put("lines", enu.getEnumeration_items().size());
+
+			if (withLines) {
+				JSONArray linesArray = new JSONArray();
+				for (String line : enu.getEnumeration_items()) {
+					linesArray.put(line);
+				}
+				enumJSON.put("Lines", linesArray);
+			}
+
+			enumerationsArray.put(enumJSON);
+		}
+
+		rootJSON.put("Enumerations", enumerationsArray);
+
+		return rootJSON;
+	}
+
+
+	public static final JSONObject getJSONExportOfSourceCode(List<CodeRegion> coderegions, boolean withCode) {
+		JSONObject rootJSON = new JSONObject();
+		rootJSON.put("amount", coderegions.size());
+
+		JSONArray sourceCodeRegionsArray = new JSONArray();
+
+		for (CodeRegion region : coderegions) {
+			JSONObject regionJSON = new JSONObject();
+			regionJSON.put("type", region.keyword);
+
+			JSONObject locationJSON = new JSONObject();
+			locationJSON.put("start", region.start);
+			locationJSON.put("end", region.end);
+
+			regionJSON.put("location", locationJSON);
+
+			if (withCode) {
+				regionJSON.put("code", region.text);
+			}
+
+			sourceCodeRegionsArray.put(regionJSON);
+		}
+
+		rootJSON.put("SourceCodeRegions", sourceCodeRegionsArray);
+
+		return rootJSON;
+	}
+
+	public static final JSONObject getJSONExportOfPatches(List<Patch> patches, boolean withHunks) {
+		JSONObject rootJSON = new JSONObject();
+		rootJSON.put("amount", patches.size());
+
+		JSONArray patchesArray = new JSONArray();
+
+		for (Patch patch : patches) {
+			JSONObject patchJSON = new JSONObject();
+			patchJSON.put("index", patch.getIndex());
+			patchJSON.put("original_file", patch.getOriginalFile());
+			patchJSON.put("modified_file", patch.getModifiedFile());
+
+			if (withHunks) {
+				JSONArray hunksArray = new JSONArray();
+				for (PatchHunk hunk : patch.getHunks()) {
+					JSONObject hunkJSON = new JSONObject();
+					hunkJSON.put("hunk", hunk.getText());
+					hunksArray.put(hunkJSON);
+				}
+				patchJSON.put("Hunks", hunksArray);
+			}
+
+			patchesArray.put(patchJSON);
+		}
+
+		rootJSON.put("Patches", patchesArray);
+
+		return rootJSON;
+	}
+
+
+
 	/**
 	 * Write a CSV line to a BufferedWriter stream
 	 * @param writer	The writer to write to
