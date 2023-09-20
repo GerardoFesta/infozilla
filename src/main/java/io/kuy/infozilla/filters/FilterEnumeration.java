@@ -39,7 +39,7 @@ public class FilterEnumeration implements IFilter {
 		System.err.println(textRemover.getText().substring(start, (end+1)));
 		System.out.println("}}}}" + textRemover.getText() + "{{{{\n\n");*/
 		// Mark this range for deletion
-		textRemover.markForDeletion(start, end+1);
+		textRemover.markForDeletion(start, end);
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class FilterEnumeration implements IFilter {
 		List<String> enumLines = new ArrayList<String>();
 
 		// All lines from start to end added
-		for (int i = startline; i < endline; i++) {
+		for (int i = startline; i < endline +1; i++) {
 			enumLines.add(lines[i]);
 			filterLine(i, text);
 		}
