@@ -44,10 +44,12 @@ public class Main implements Runnable{
   @Parameters(arity = "1..*", paramLabel = "FILE", description = "File(s) to process.")
   private File[] inputFiles;
 
-  
+  @Option(names = { "-o", "--output-format" }, description = "Output format (json, xml, xls, etc.)")
+  private String outputFormat = "xml"; // Valore predefinito
+
   @Override
   public void run() {
-    
+
     for (File f : inputFiles) {
       try {
         process(f);
@@ -56,11 +58,11 @@ public class Main implements Runnable{
         System.exit(1);
       }
     }
-    
+
   }
 
   private void process(File f) throws Exception {
-    // Read file    
+    // Read file
     String data = Files.readString(f.toPath(), Charset.forName(inputCharset));
 
     // Run infozilla
@@ -68,11 +70,11 @@ public class Main implements Runnable{
 
     // Infozilla remembers the original input text
     // String original_text = infozilla_filters.getInputText();
-    
+
     // Infozilla can filter out all structural elements and output
     // the remaining (natural language text parts) of the input.
     String filtered_text = infozilla_filters.getOutputText();
-    
+
     System.out.println("Extracted Structural Elements from " + f.getAbsolutePath());
     System.out.println(infozilla_filters.getPatches().size() + "\t Patches");
     System.out.println(infozilla_filters.getTraces().size() + "\t Stack Traces");
@@ -98,6 +100,6 @@ public class Main implements Runnable{
 
   public static void main(String[] args) {
     CommandLine.run(new Main(), args);
-}
+  }
 
 }
