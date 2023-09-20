@@ -364,6 +364,200 @@ public class DataExportUtility {
 		return rootJSON;
 	}
 
+	//CSV
+
+	public static String exportPatchesToCSV(List<Patch> patches, boolean withHunks) {
+
+		StringBuilder csvData = new StringBuilder();
+		csvData.append("\"" + "Amount" + "\"");
+		csvData.append(",");
+		csvData.append("\"" + "Index" + "\"");
+		csvData.append(",");
+		csvData.append("\"" + "Original File" + "\"");
+		csvData.append(",");
+		csvData.append("\"" + "Modified File" + "\"");
+		csvData.append(",");
+
+		if (withHunks) {
+			csvData.append("\"" + "Hunk Text" + "\"");
+		}
+
+		csvData.append("\n");
+
+
+		for (Patch patch : patches) {
+			if (withHunks) {
+				for (PatchHunk hunk : patch.getHunks()) {
+					csvData.append("\"" +  patches.size() + "\"");
+					csvData.append(",");
+					csvData.append( "\"" +  patch.getIndex() + "\"" );
+					csvData.append(",");
+					csvData.append("\"" + patch.getOriginalFile() + "\"");
+					csvData.append(",");
+					csvData.append("\"" + patch.getModifiedFile() + "\"");
+					csvData.append(",");
+					csvData.append("\"" + hunk.getText() + "\"");
+					csvData.append("\n");
+				}
+			}else{
+				csvData.append("\"" +  patches.size() + "\"");
+				csvData.append(",");
+				csvData.append( "\"" +  patch.getIndex() + "\"" );
+				csvData.append(",");
+				csvData.append("\"" + patch.getOriginalFile() + "\"");
+				csvData.append(",");
+				csvData.append("\"" + patch.getModifiedFile() + "\"");
+				csvData.append("\n");
+			}
+
+		}
+
+		return csvData.toString();
+	}
+
+	public static String getCSVExportOfSourceCode(List<CodeRegion> coderegions, boolean withCode) {
+		StringBuilder csvData = new StringBuilder();
+		csvData.append("\"" + "Type" + "\"");
+		csvData.append(",");
+		csvData.append("\"" + "Start" + "\"");
+		csvData.append(",");
+		csvData.append("\"" + "End" + "\"");
+
+		if (withCode) {
+			csvData.append(",");
+			csvData.append("\"" + "Code" + "\"");
+
+		}
+		csvData.append("\n");
+
+		for (CodeRegion region : coderegions) {
+			if (withCode) {
+				csvData.append("\"" + region.keyword + "\"");
+				csvData.append(",");
+				csvData.append("\"" + region.start + "\"");
+				csvData.append(",");
+				csvData.append("\"" + region.end+ "\"");
+				csvData.append(",");
+				csvData.append("\"" + region.text+ "\"");
+				csvData.append("\n");
+			}
+			else{
+				csvData.append("\"" + region.keyword + "\"");
+				csvData.append(",");
+				csvData.append("\"" + region.start + "\"");
+				csvData.append(",");
+				csvData.append("\"" + region.end+ "\"");
+				csvData.append("\n");
+			}
+		}
+
+		return csvData.toString();
+	}
+
+
+	public static String getCSVExportOfEnumerations(List<Enumeration> enumerations, boolean withLines) {
+		StringBuilder csvData = new StringBuilder();
+		csvData.append( "\"" + "Amount" + "\"");
+
+		if (withLines) {
+			csvData.append(",");
+			csvData.append("\"" + "Enumeration" + "\"");
+			csvData.append(",");
+			csvData.append( "\"" + "Item" + "\"");
+		}
+
+
+		for (Enumeration enu : enumerations) {
+			if (withLines) {
+				for (String line : enu.getEnumeration_items()) {
+					csvData.append("\n");
+					csvData.append("\""+enumerations.size()+"\"").append(",");
+					csvData.append("\""+enu.getEnumeration_items().size()+"\"").append(",");
+					csvData.append("\""+line +"\"");
+				}
+			}
+		}
+
+		return csvData.toString();
+	}
+
+	public static String getCSVExportOfStackTraces(List<StackTrace> traces, boolean withFrames, Timestamp ts) {
+
+		StringBuilder csvData = new StringBuilder();
+		csvData.append("\"" + "Amount" + "\"");
+		csvData.append(",");
+		csvData.append("\"" + "Type" + "\"");
+		csvData.append(",");
+		csvData.append("\"" + "Timestamp" + "\"");
+		csvData.append(",");
+		csvData.append("\"" + "Exception" + "\"");
+		csvData.append(",");
+		csvData.append("\"" + "Reason" + "\"");
+
+
+
+		if (withFrames) {
+			csvData.append(",");
+			csvData.append("\"" + "Depth" + "\"");
+			csvData.append(",");
+			csvData.append("\"" + "Frame" + "\"");
+
+
+			csvData.append("\n");
+
+
+			for (StackTrace trace : traces) {
+
+				if (withFrames) {
+
+					int depth = 0;
+					for (String frame : trace.getFrames()) {
+						csvData.append("\"" + traces.size() + "\"");
+						csvData.append(",");
+						if (trace.isCause()) {
+							csvData.append("\"" + "Cause" + "\"");
+						} else {
+							csvData.append("\"" + "Stacktrace" + "\"");
+						}
+						csvData.append(",");
+						csvData.append("\"" + ts.getTime() + "\"");
+						csvData.append(",");
+						csvData.append("\"" + trace.getException() + "\"");
+						csvData.append(",");
+						csvData.append("\"" + trace.getReason() + "\"");
+						csvData.append(",");
+
+						csvData.append("\"" + depth + "\"" ).append(",").append("\""  + frame + "\"" );
+						depth++;
+						csvData.append("\n");
+					}
+				}
+			}
+		}
+		else {
+			for (StackTrace trace : traces) {
+				csvData.append("\"" + traces.size() + "\"");
+				csvData.append(",");
+				if (trace.isCause()) {
+					csvData.append("\"" + "Cause" + "\"");
+				} else {
+					csvData.append("\"" + "Stacktrace" + "\"");
+				}
+				csvData.append(",");
+				csvData.append("\"" + ts.getTime() + "\"");
+				csvData.append(",");
+				csvData.append("\"" + trace.getException() + "\"");
+				csvData.append(",");
+				csvData.append("\"" + trace.getReason() + "\"");
+				csvData.append(",");
+				csvData.append("\n");
+			}
+		}
+		return csvData.toString();
+	}
+
+
+
 
 
 	/**
