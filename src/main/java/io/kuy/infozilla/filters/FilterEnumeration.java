@@ -63,7 +63,7 @@ public class FilterEnumeration implements IFilter {
 		}
 		// and all lines from endline till the end of the paragraph!
 		int lastline = endline;
-		for (int i = endline; i < lines.length; i++)
+/*		for (int i = endline; i < lines.length; i++)
 			if (lines[i].length() == 0) {
 				break;
 			}
@@ -72,7 +72,7 @@ public class FilterEnumeration implements IFilter {
 				filterLine(i, text);
 				lastline = i;
 			}
-
+*/
 		// Calculate start position
 		int eStart = 0;
 		for (int i=0; i < startline; i++) {
