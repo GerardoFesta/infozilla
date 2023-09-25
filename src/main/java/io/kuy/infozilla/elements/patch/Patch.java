@@ -18,8 +18,19 @@ public class Patch {
 	private String header = "";
 	private int startPosition;
 	private int endPosition;
-	
+	private boolean unifiedDiff=false;
+
 	private List<PatchHunk> hunks;
+
+
+	public void setUnifiedDiff(boolean unifiedDiff) {
+		this.unifiedDiff = unifiedDiff;
+	}
+
+	public boolean isUnifiedDiff() {
+		return unifiedDiff;
+	}
+
 	
 	public Patch() {
 		hunks = new ArrayList<PatchHunk>();

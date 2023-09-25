@@ -28,6 +28,8 @@ public class PatchParser {
 			if (lines[i].startsWith("Index: ")) {
 				// Check if the following line starts with "====="
 				if (lines[i+1].startsWith("====")) {
+
+				}else if (lines[i].startsWith("diff --git") && lines[i + 1].startsWith("index ") && lines[i + 2].startsWith("--- ") && lines[i + 3].startsWith("+++ ")) {
 					found = i;
 					break;
 				}
@@ -238,12 +240,24 @@ public class PatchParser {
 			
 			Patch patch = new Patch();
 			// Gather Header Information of the Patch
-			String pIndex = findFirstLineBeginningWithS("Index: ", lines, 0);
-			patch.setIndex(pIndex);
-			String pOrig  = findFirstLineBeginningWithS("--- ", lines, 0);
-			patch.setOriginalFile(pOrig);
-			String pModi  = findFirstLineBeginningWithS("+++ ", lines, 0);
-			patch.setModifiedFile(pModi);
+			if(!findFirstLineBeginningWithS("diff --git", lines, 0).isEmpty()){
+				String pIndex = findFirstLineBeginningWithS("index ", lines, 0);
+				patch.setIndex(pIndex);
+				String pOrig  = findFirstLineBeginningWithS("--- ", lines, 0);
+				patch.setOriginalFile(pOrig);
+				String pModi  = findFirstLineBeginningWithS("+++ ", lines, 0);
+				patch.setModifiedFile(pModi);
+				patch.setUnifiedDiff(true);
+			}
+			else {
+				String pIndex = findFirstLineBeginningWithS("Index: ", lines, 0);
+				patch.setIndex(pIndex);
+				String pOrig = findFirstLineBeginningWithS("--- " , lines, 0);
+				patch.setOriginalFile(pOrig);
+				String pModi = findFirstLineBeginningWithS("+++ ", lines, 0);
+				patch.setModifiedFile(pModi);
+			}
+
 			
 			// Find the first Hunk Header
 			int    pModiNum = findFirstLineBeginningWith("+++ ", lines, 0);
