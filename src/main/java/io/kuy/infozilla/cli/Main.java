@@ -7,9 +7,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
+import io.kuy.infozilla.githubscraper.IssueScraper;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -44,16 +46,44 @@ public class Main implements Runnable{
   @Option(names = "--charset", description = "Character Set of Input (default=ISO-8859-1)")
   private String inputCharset = "ISO-8859-1";
 
-  @Parameters(arity = "1..*", paramLabel = "FILE", description = "File(s) to process.")
+  @Option(names = "-f", arity = "1..*", paramLabel = "FILE", description = "File(s) to process.")
   private File[] inputFiles;
 
+  @Option(names = "-u", arity = "1..*", paramLabel = "URL", description = "Github Issue/s to process.")
+  private String[] remote_urls;
   @Option(names = { "-o", "--output-format" }, description = "Output format (json, xml, xls, etc.)")
   private String outputFormat = "xml"; // Valore predefinito
 
   @Override
   public void run() {
+    ArrayList<File> files_from_url = new ArrayList<File>();
+    if(remote_urls != null){
+      IssueScraper scraper = new IssueScraper();
+      try {
+        for (String url: remote_urls){
+          String file_path = scraper.runScraper(url);
+          File f = new File(file_path);
+          files_from_url.add(f);
+        }
 
-    for (File f : inputFiles) {
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+
+    if(inputFiles!= null){
+      for (File f : inputFiles) {
+        try {
+          process(f);
+        } catch (Exception e) {
+          e.printStackTrace();
+          System.exit(1);
+        }
+      }
+    }
+
+    for (File f : files_from_url) {
       try {
         process(f);
       } catch (Exception e) {

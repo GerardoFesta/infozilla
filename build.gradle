@@ -46,6 +46,15 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 }
 
+repositories {
+    maven {
+        url 'https://mvnrepository.com/artifact/org.eclipse.mylyn.github/org.eclipse.egit.github.core'
+    }
+}
+
+dependencies {
+    implementation 'org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5'
+}
 
 
 mainClassName = 'io.kuy.infozilla.cli.Main'
