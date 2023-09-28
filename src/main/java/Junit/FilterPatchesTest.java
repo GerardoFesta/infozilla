@@ -255,5 +255,37 @@ public class FilterPatchesTest {
         assertEquals(" ", result);
     }
 
+    @Test
+    public void testGetOutputText4() {
+        FilterPatches filter = new FilterPatches();
+        String inputText = "diff --git a/file_originale.txt b/file_modificato.txt\n"
+                + "index a1b2c3d..e4f5g6h 100644\n"
+                + "--- a/file_originale.txt\n"
+                + "+++ b/file_modificato.txt\n"
+                + "@@ -1,6 +1,6 @@\n"
+                + " Questo è un file di esempio.\n"
+                + "-Riga originale 1\n"
+                + "-Riga originale 2\n"
+                + "-Riga originale 3\n"
+                + "+Riga modificata 1\n"
+                + "+Riga modificata 2\n"
+                + "+Riga aggiunta 2.5\n"
+                + " Riga originale 4\n"
+                + "-Riga originale 5\n"
+                + "+Riga modificata 3\n"
+                + " Riga originale 6\n"
+                + " Riga originale 7\n"
+                + " Riga originale 8\n";
+
+
+        List<Patch> patches = filter.runFilter(inputText);
+
+        String result = filter.getOutputText();
+
+
+        assertEquals("", result.replaceAll("\n",""));
+    }
+
+
 
 }
