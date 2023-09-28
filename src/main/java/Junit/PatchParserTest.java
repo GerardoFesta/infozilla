@@ -159,6 +159,8 @@ public class PatchParserTest {
 
         Patch patch = patches.get(0);
         assertEquals(1,patch.getHunks().size());
+        patch = patches.get(1);
+        assertEquals(1,patch.getHunks().size());
 
     }
 
