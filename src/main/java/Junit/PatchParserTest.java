@@ -100,7 +100,7 @@ public class PatchParserTest {
                 + "\n More changes.\n"
                 + "\n The end.\n\n\n", patch.getHunks().get(0).getText().replaceAll("\r", ""));
     }
-    //ERROR unified diff not recognized
+
     @Test
     public void testDiffPatch1(){
         String inputText = "diff --git a/file_originale.txt b/file_modificato.txt\n"
@@ -124,9 +124,11 @@ public class PatchParserTest {
         PatchParser patchParser = new PatchParser();
         List<Patch> patches = patchParser.parseForPatches(inputText);
         assertEquals(1,patches.size());
+        Patch patch = patches.get(0);
+        assertEquals(1,patch.getHunks().size());
 
     }
-    //error incorrect number of hunks: EXPECTED:1 Actual:2
+
     @Test
     public void testDiffPatchHunks() {
         String inputText = "Index: file1.txt\n"
@@ -165,7 +167,7 @@ public class PatchParserTest {
     }
 
 
-    //ERROR WITH /n
+
     @Test
     public void testParsePatchWithWhitespace() {
         String inputText = "Index: file1.txt\n"
@@ -192,7 +194,7 @@ public class PatchParserTest {
         //RESULT:"THIS IS A TEST "
 
     }
-    //ERROR: text without leading white space
+
     @Test
     public void testParsePatch_TextWithoutLeadingWhitespace() {
         String inputText = "Index: file1.txt\n"
@@ -219,7 +221,7 @@ public class PatchParserTest {
 
     }
 
-    //ERROR: " @@ -1,6 +1,6 @@\n"  teh leading space
+
     @Test
     public void testParsePatch_WithLeadingWhitespace_hunk() {
         String inputText = "Index: file1.txt\n"
@@ -240,7 +242,7 @@ public class PatchParserTest {
 
 
     }
-    //ERROR: " Index: file1.txt\n"  teh leading space
+
     @Test
     public void testParsePatch_WithLeadingWhitespace_Index() {
         String inputText = " Index: file1.txt\n"
