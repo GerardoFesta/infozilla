@@ -25,16 +25,18 @@ public class PatchParser {
 		int found = -1;
 		for (int i=start; i < lines.length-1; i++) {
 			// Find the next line that starts with "Index: "
-			if (lines[i].startsWith("Index: ")) {
-				// Check if the following line starts with "====="
-				if (lines[i + 1].startsWith("====")) {
-					if(lines[i + 2].startsWith("--- ")){
-						if(lines[i + 3].startsWith("+++ ")){
-							found = i;
-							break;
+			if(lines.length>=i+3) {
+				if (lines[i].startsWith("Index: ")) {
+					// Check if the following line starts with "====="
+					if (lines[i + 1].startsWith("====")) {
+						if (lines[i + 2].startsWith("--- ")) {
+							if (lines[i + 3].startsWith("+++ ")) {
+								found = i;
+								break;
+							}
 						}
-					}
 
+					}
 				}
 			}
 			// Check if the following line starts with "--- " and "+++ " indicating a unified diff section
