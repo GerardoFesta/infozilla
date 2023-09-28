@@ -14,7 +14,7 @@ public class PatchParser {
 	// Change the following line if you need debug output 
 	// Debug output is VERY verbose, so it's turned off by default!
 	private final static boolean debug = false;
-	
+
 	/**
 	 * Find the next line among the set of lines[] that looks like a Patch Index: line.
 	 * @param lines	the lines in which to look for the patch start.
@@ -25,20 +25,31 @@ public class PatchParser {
 		int found = -1;
 		for (int i=start; i < lines.length-1; i++) {
 			// Find the next line that starts with "Index: "
-			if (lines[i].startsWith("Index: ")) {
-				// Check if the following line starts with "====="
-				if (lines[i+1].startsWith("====")) {
+			if(lines.length>=i+3) {
+				if (lines[i].startsWith("Index: ")) {
+					// Check if the following line starts with "====="
+					if (lines[i + 1].startsWith("====")) {
+						if (lines[i + 2].startsWith("--- ")) {
+							if (lines[i + 3].startsWith("+++ ")) {
+								found = i;
+								break;
+							}
+						}
 
-				}else if (lines[i].startsWith("diff --git") && lines[i + 1].startsWith("index ") && lines[i + 2].startsWith("--- ") && lines[i + 3].startsWith("+++ ")) {
+					}
+				}
+
+				// Check if the following line starts with "--- " and "+++ " indicating a unified diff section
+				else if (lines[i].startsWith("diff --git") && lines[i + 1].startsWith("index ") && lines[i + 2].startsWith("--- ") && lines[i + 3].startsWith("+++ ")) {
 					found = i;
 					break;
 				}
-				
 			}
+
 		}
 		return found;
 	}
-	
+
 	/**
 	 * Find the next Hunk start beginning from {@link start} in a set of {@link lines}.
 	 * @param lines The lines to search for the next Hunk start.
@@ -56,7 +67,7 @@ public class PatchParser {
 		}
 		return found;
 	}
-	
+
 	/**
 	 * Splits a text into a List of possible Patches.
 	 * @param text The text to split into patches.
@@ -65,16 +76,16 @@ public class PatchParser {
 	private List<String> partitionByIndex(String text) {
 		// This will be a list of all potential Patch Areas
 		List<String> indexPartition = new ArrayList<String>();
-		
+
 		// Split the complete text into single lines to work with
 		String[] lines = text.split("[\n\r]");
-		
+
 		// When we start we think there are more Patches inside ;)
 		boolean hasMore = true;
-		
+
 		// We start at the very beginning of our text
 		int idxStart = -1;
-		
+
 		// Find all areas
 		while (hasMore) {
 			idxStart = findNextIndex(lines, idxStart +1);
@@ -82,7 +93,7 @@ public class PatchParser {
 				// if there is no next start we are done
 				hasMore = false;
 			} else {
-				// otherwise see if there is another index 
+				// otherwise see if there is another index
 				int idxEnd = findNextIndex(lines, idxStart +1);
 				if (idxEnd == -1) {
 					// add the whole range because there is no more next idx start
@@ -99,16 +110,16 @@ public class PatchParser {
 						range = range + lines[i] + System.getProperty("line.separator");
 					}
 					indexPartition.add(range);
-					
+
 					// and set the new idxStart to end !
 					idxStart = idxEnd -1;
 				}
 			}
 		}
-		
+
 		return indexPartition;
 	}
-	
+
 	/**
 	 * Find the first line that starts with a given String
 	 * @param text The text the line we look for starts with
@@ -126,8 +137,8 @@ public class PatchParser {
 		}
 		return found;
 	}
-	
-	
+
+
 	/**
 	 * Find the first line that starts with a given String
 	 * @param text The text the line we look for starts with
@@ -145,8 +156,8 @@ public class PatchParser {
 		}
 		return found;
 	}
-	
-	
+
+
 	/**
 	 * Checks whether the given line is a line that belongs to a hunk or not.
 	 * @param line the line to check for being a Hunk Line.
@@ -156,7 +167,7 @@ public class PatchParser {
 		boolean isHunkLine = ((line.startsWith("+")) || (line.startsWith("-")) || (line.startsWith(" ")));
 		return isHunkLine;
 	}
-	
+
 	/**
 	 * Find and extract all Hunks in a Patch
 	 * @param lines A set of Patch Lines
@@ -190,37 +201,47 @@ public class PatchParser {
 					// Otherwise we will look only until the next Hunk beginning
 					searchEnd = nextHunkStart -1;
 				}
-					if (debug) System.out.println("<>>> Will look for HunkLines from " + (hStart+1) + " to " + (searchEnd-1));
-					String hunktext = "";
-					for (int i = hStart +1; i < searchEnd; i++) {
-						if (debug) System.out.println("<>>> Checking if Hunkline: " + lines[i]);
-						if (isHunkLine(lines[i])) { 
-							if (debug) System.out.println("<>>> Yes it is!");
-							hunktext = hunktext + lines[i] + lineSep;
-						} else {
-							if (i < searchEnd -1) {
-								if (isHunkLine(lines[i+1])) {
-									if (debug) System.out.println("<>>> No But next line is!");
-									hunktext = hunktext + lines[i] + lineSep;
-								}
-								else {
-									// we are done
-									if (debug) System.out.println("<>>> No it is not and niether is the next one! We should stop here!");
-									searchEnd = i;
-								}
+				if (debug) System.out.println("<>>> Will look for HunkLines from " + (hStart+1) + " to " + (searchEnd-1));
+				String hunktext = "";
+				for (int i = hStart+1 ; i < searchEnd; i++) {
+					if (debug) System.out.println("<>>> Checking if Hunkline: " + lines[i]);
+					if (lines[i].isEmpty()) {
+						if (debug) System.out.println("<>>> Yes it is!");
+						hunktext = hunktext + lines[i] + lineSep;
+					} else {
+						if (i < searchEnd -1) {
+							if(isHunkLine(lines[i])){
+								if (debug) System.out.println("<>>> Yes it is!");
+								hunktext = hunktext + lines[i] + lineSep;
+							}
+							else if(lines[i+1].isEmpty() && isHunkLine(lines[i+2]) ){
+								if (debug) System.out.println("<>>> Yes it is!");
+								//hunktext = hunktext + lines[i] + lineSep;
+							}
+							else {
+								// we are done
+								if (debug) System.out.println("<>>> No it is not and niether is the next one! We should stop here!");
+								searchEnd = i;
+							}
+						}
+						if(i == searchEnd-1){
+							if(isHunkLine(lines[i])){
+								if (debug) System.out.println("<>>> Yes it is!");
+								hunktext = hunktext + lines[i] + lineSep;
 							}
 						}
 					}
-					// Kill last newline
-					if (hunktext.length() > 1)
-						hunktext = hunktext.substring(0, hunktext.length()-1);
-					foundHunks.add(new PatchHunk(hunktext));	
-					hStart = nextHunkStart -1;
 				}
+				// Kill last newline
+				if (hunktext.length() > 1)
+					hunktext = hunktext.substring(0, hunktext.length()-1);
+				foundHunks.add(new PatchHunk(hunktext));
+				hStart = nextHunkStart -1;
 			}
+		}
 		return foundHunks;
 	}
-	
+
 	/**
 	 * Parses a given text for all Patches inside using a 2 line lookahead Fuzzy Parser approach.
 	 * @param text The text to extract Patches from.
@@ -233,11 +254,11 @@ public class PatchParser {
 		// First Partition the whole given text into sections starting with Index:
 		// The parts of the partition mark on potential patch
 		List<String> indexPartition = partitionByIndex(text);
-		
+
 		// For each potential patch area split into header and a list of potential hunks
 		for (String potentialPatch : indexPartition) {
 			String[] lines = potentialPatch.split("[\n\r]");
-			
+
 			Patch patch = new Patch();
 			// Gather Header Information of the Patch
 			if(!findFirstLineBeginningWithS("diff --git", lines, 0).isEmpty()){
@@ -258,15 +279,14 @@ public class PatchParser {
 				patch.setModifiedFile(pModi);
 			}
 
-			
 			// Find the first Hunk Header
-			int    pModiNum = findFirstLineBeginningWith("+++ ", lines, 0);
+			int pModiNum = findFirstLineBeginningWith("+++ ", lines, 0);
 			int firstHunkLine = findNextHunkHeader(lines, pModiNum + 1);
-			
+
 			// If there is no Hunk then the patch is invalid!
 			if (firstHunkLine == -1)
 				break;
-			
+
 			// Now we can add the complete Header
 			String header = "";
 			for (int i=0; i < firstHunkLine-1; i++) {
@@ -274,26 +294,47 @@ public class PatchParser {
 			}
 			header = header + lines[firstHunkLine-1];
 			patch.setHeader(header);
-			
+
 			// Discover all Hunks!
 			List<PatchHunk> hunks = findAllHunks(lines, firstHunkLine);
-			
+
 			// And add the Hunks to the List of Hunks for this patch
 			for (PatchHunk h : hunks) patch.addHunk(h);
 			foundPatches.add(patch);
 		}
-		
+		int start=0;
+		int patchEnd=0;
 		// Locate the Patches in the Source Code
 		for (Patch p : foundPatches) {
-			int patchStart = text.indexOf(p.getHeader());
-			
-			int patchEnd = text.lastIndexOf(p.getHunks().get(p.getHunks().size()-1).getText())
-							+ p.getHunks().get(p.getHunks().size()-1).getText().length();
-			
-			p.setStartPosition(patchStart);
+
+			if(p.isUnifiedDiff()) {
+				int patchStartGit = text.indexOf("diff --git" , start);
+				String te= p.getHunks().get(p.getHunks().size()-1).getText().replaceAll("\r","");
+				patchEnd = text.indexOf(te.replaceAll("\n\n","\n"),patchStartGit)+ te.replaceAll("\n\n","\n").replaceAll("\r","").length();
+				p.setStartPosition(patchStartGit);
+			}
+			else {
+				int lenghtHunk=0;
+				String lastTextHunk="";
+				int patchStart = text.indexOf("Index: " + p.getIndex(), start);
+
+				lastTextHunk= p.getHunks().get(p.getHunks().size()-1).getText().replaceAll("\r","");
+				lenghtHunk =lastTextHunk.replaceAll("\n\n","\n").replaceAll("\r","").length();
+				patchEnd = text.indexOf(lastTextHunk.replaceAll("\n\n","\n"),patchStart)+lenghtHunk;
+				p.setStartPosition(patchStart);
+			}
+
+			start=patchEnd;
+
+//			int patchEnd = text.lastIndexOf(p.getHunks().get(p.getHunks().size()-1).getText())
+//					+ p.getHunks().get(p.getHunks().size()-1).getText().length();
+//
+//
+
+
 			p.setEndPosition(patchEnd);
 		}
-		
+
 		// Here is the patch we found
 		return foundPatches;
 	}
