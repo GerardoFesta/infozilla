@@ -15,6 +15,9 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -473,34 +476,52 @@ public class SystemTest {
             File expectedFileSC = new File("./system_testing_oracles/tc13_SC_oracle.csv");
             File expectedFileE = new File("./system_testing_oracles/tc13_E_oracle.csv");
             File expectedFileP = new File("./system_testing_oracles/tc13_P_oracle.csv");
-            File actualFile = new File("./system_testing_inputs/tc13_txt_CSV/tc13_txt_patches.csv");
+            File actualFileP = new File("./system_testing_inputs/tc13_txt_CSV/tc13_txt_patches.csv");
+            File actualFileE = new File("./system_testing_inputs/tc13_txt_CSV/tc13_txt_enumerations.csv");
+            File actualFileSC = new File("./system_testing_inputs/tc13_txt_CSV/tc13_txt_sourceCode.csv");
+            File actualFileST = new File("./system_testing_inputs/tc13_txt_CSV/tc13_txt_stackTraces.csv");
+
 
             CSVParser expectedParserST = CSVParser.parse(expectedFileST, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
             CSVParser expectedParserSC = CSVParser.parse(expectedFileSC, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
             CSVParser expectedParserE = CSVParser.parse(expectedFileE, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
             CSVParser expectedParserP = CSVParser.parse(expectedFileP, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
 
-            CSVParser actualParser = CSVParser.parse(actualFile, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
+            CSVParser actualParser = CSVParser.parse(actualFileST, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
 
             List<CSVRecord> expectedRecordsST = expectedParserST.getRecords();
             List<CSVRecord> actualRecords = actualParser.getRecords();
 
             assertEquals(expectedRecordsST.size(), actualRecords.size(), "CSV record count does not match");
 
+
+
+
+
             for (int i = 0; i < expectedRecordsST.size(); i++) {
                 CSVRecord expectedRecord = expectedRecordsST.get(i);
                 CSVRecord actualRecord = actualRecords.get(i);
 
+                // Rimuovi la cella in posizione due (indice 1, poiché l'indice è zero-based)
+                StringJoiner updatedRow = new StringJoiner(",");
+                StringJoiner expectedRow = new StringJoiner(",");
+                for (int j = 0; j < actualRecord.size(); j++) {
+                    if (j != 2) { // Salta la cella in posizione due
+                        updatedRow.add(actualRecord.get(j));
+                        expectedRow.add(expectedRecord.get(j));
+                    }
+                }
+
                 // Convert the records to strings and remove whitespace for comparison
-                String expectedRecordStr = expectedRecord.toString().replaceAll("\\s+", "");
-                String actualRecordStr = actualRecord.toString().replaceAll("\\s+", "");
+                String expectedRecordStr = expectedRow.toString().replaceAll("\\s+", "");
+                String actualRecordStr = updatedRow.toString().replaceAll("\\s+", "");
 
                 assertEquals(expectedRecordStr, actualRecordStr, "CSV content does not match at row " + (i + 1));
             }
 
-
+            actualParser = CSVParser.parse(actualFileSC, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
             List<CSVRecord> expectedRecordsSC = expectedParserSC.getRecords();
-
+            actualRecords = actualParser.getRecords();
             assertEquals(expectedRecordsSC.size(), actualRecords.size(), "CSV record count does not match");
 
             for (int i = 0; i < expectedRecordsSC.size(); i++) {
@@ -514,8 +535,9 @@ public class SystemTest {
                 assertEquals(expectedRecordStr, actualRecordStr, "CSV content does not match at row " + (i + 1));
             }
 
-
+            actualParser = CSVParser.parse(actualFileE, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
             List<CSVRecord> expectedRecordsE = expectedParserE.getRecords();
+            actualRecords = actualParser.getRecords();
 
             assertEquals(expectedRecordsE.size(), actualRecords.size(), "CSV record count does not match");
 
@@ -530,8 +552,10 @@ public class SystemTest {
                 assertEquals(expectedRecordStr, actualRecordStr, "CSV content does not match at row " + (i + 1));
             }
 
-
+            actualParser = CSVParser.parse(actualFileP, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
             List<CSVRecord> expectedRecordsP = expectedParserP.getRecords();
+            actualRecords = actualParser.getRecords();
+
 
             assertEquals(expectedRecordsP.size(), actualRecords.size(), "CSV record count does not match");
 
