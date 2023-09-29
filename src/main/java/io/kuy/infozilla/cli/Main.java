@@ -120,38 +120,59 @@ public class Main implements Runnable{
       case "csv":
         // Export as CSV
          p = f.getAbsolutePath();
-         s =p.split("\\\\");
-        s[s.length - 1] = s[s.length - 1].replace(".","_");
-        s[s.length - 2] = s[s.length -2] + "\\"+ s[s.length - 1 ]+"_CSV";
-        modP = String.join("\\\\", s);
-        sdir = Arrays.copyOf(s,s.length-1);
-        dirp = String.join("\\\\", sdir);
+         if(p.contains("/")){
+           s = p.split("/");
+           s[s.length - 1] = s[s.length - 1].replace(".","_");
+           s[s.length - 2] = s[s.length -2] + "/"+ s[s.length - 1 ]+"_CSV";
+           modP = String.join("/", s);
+           sdir = Arrays.copyOf(s,s.length-1);
+           dirp = String.join("/", sdir);
 
-        String patchesCSV = DataExportUtility.exportPatchesToCSV(infozilla_filters.getPatches(), true);
-        String stackTracesCSV = DataExportUtility.getCSVExportOfStackTraces(infozilla_filters.getTraces(), true, new Timestamp(new Date().getTime()));
-        String sourceCodeCSV = DataExportUtility.getCSVExportOfSourceCode(infozilla_filters.getRegions(), true);
-        String enumerationsCSV = DataExportUtility.getCSVExportOfEnumerations(infozilla_filters.getEnumerations(), true);
+         }else {
+           s = p.split("\\\\");
+           System.out.println(p);
+           s[s.length - 1] = s[s.length - 1].replace(".", "_");
+           s[s.length - 2] = s[s.length - 2] + "\\" + s[s.length - 1] + "_CSV";
+           modP = String.join("\\\\", s);
+           sdir = Arrays.copyOf(s, s.length - 1);
+           dirp = String.join("\\\\", sdir);
+         }
 
-        if( !Files.exists(Path.of(dirp))){
-          Files.createDirectories(Path.of(dirp));
-        }
+          String patchesCSV = DataExportUtility.exportPatchesToCSV(infozilla_filters.getPatches(), true);
+          String stackTracesCSV = DataExportUtility.getCSVExportOfStackTraces(infozilla_filters.getTraces(), true, new Timestamp(new Date().getTime()));
+          String sourceCodeCSV = DataExportUtility.getCSVExportOfSourceCode(infozilla_filters.getRegions(), true);
+          String enumerationsCSV = DataExportUtility.getCSVExportOfEnumerations(infozilla_filters.getEnumerations(), true);
 
-        Files.writeString(Path.of(modP+ "_patches.csv"), patchesCSV, Charset.forName(inputCharset), StandardOpenOption.CREATE );
-        Files.writeString(Path.of(modP + "_stackTraces.csv"), stackTracesCSV, Charset.forName(inputCharset), StandardOpenOption.CREATE );
-        Files.writeString(Path.of(modP + "_sourceCode.csv"), sourceCodeCSV, Charset.forName(inputCharset), StandardOpenOption.CREATE );
-        Files.writeString(Path.of(modP + "_enumerations.csv"), enumerationsCSV, Charset.forName(inputCharset), StandardOpenOption.CREATE );
-        break;
+          if( !Files.exists(Path.of(dirp))){
+            Files.createDirectories(Path.of(dirp));
+          }
+
+          Files.writeString(Path.of(modP+ "_patches.csv"), patchesCSV, Charset.forName(inputCharset), StandardOpenOption.CREATE );
+          Files.writeString(Path.of(modP + "_stackTraces.csv"), stackTracesCSV, Charset.forName(inputCharset), StandardOpenOption.CREATE );
+          Files.writeString(Path.of(modP + "_sourceCode.csv"), sourceCodeCSV, Charset.forName(inputCharset), StandardOpenOption.CREATE );
+          Files.writeString(Path.of(modP + "_enumerations.csv"), enumerationsCSV, Charset.forName(inputCharset), StandardOpenOption.CREATE );
+          break;
 
 
       case "xls":
         // Export as XLS
         p = f.getAbsolutePath();
-        s = p.split("\\\\");
-        s[s.length - 1] = s[s.length - 1].replace(".","_");
-        s[s.length - 2] = s[s.length -2] + "\\"+ s[s.length - 1 ]+"_XLS";
-        modP = String.join("\\\\", s);
-        sdir = Arrays.copyOf(s,s.length-1);
-        dirp = String.join("\\\\", sdir);
+        if(p.contains("/")){
+          s = p.split("/");
+          s[s.length - 1] = s[s.length - 1].replace(".","_");
+          s[s.length - 2] = s[s.length -2] + "/"+ s[s.length - 1 ]+"_XLS";
+          modP = String.join("/", s);
+          sdir = Arrays.copyOf(s,s.length-1);
+          dirp = String.join("/", sdir);
+
+        }else {
+          s = p.split("\\\\");
+          s[s.length - 1] = s[s.length - 1].replace(".", "_");
+          s[s.length - 2] = s[s.length - 2] + "\\" + s[s.length - 1] + "_XLS";
+          modP = String.join("\\\\", s);
+          sdir = Arrays.copyOf(s, s.length - 1);
+          dirp = String.join("\\\\", sdir);
+        }
 
         if( !Files.exists(Path.of(dirp))){
           Files.createDirectories(Path.of(dirp));

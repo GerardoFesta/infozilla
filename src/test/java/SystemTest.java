@@ -6,10 +6,15 @@ import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
 import picocli.CommandLine;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.nio.charset.Charset;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -449,6 +454,106 @@ public class SystemTest {
             fail();
         }
     }
+
+
+
+    @Test
+    public void tc13() {
+        String[] args = {
+                "--charset", "UTF-8",
+                "./system_testing_inputs/tc13.txt",
+                "-o=csv"
+        };
+
+        Main main = new Main();
+        CommandLine.run(main, args);
+
+        try {
+            File expectedFileST = new File("./system_testing_oracles/tc13_ST_oracle.csv");
+            File expectedFileSC = new File("./system_testing_oracles/tc13_SC_oracle.csv");
+            File expectedFileE = new File("./system_testing_oracles/tc13_E_oracle.csv");
+            File expectedFileP = new File("./system_testing_oracles/tc13_P_oracle.csv");
+            File actualFile = new File("./system_testing_inputs/tc13_txt_CSV/tc13_txt_patches.csv");
+
+            CSVParser expectedParserST = CSVParser.parse(expectedFileST, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
+            CSVParser expectedParserSC = CSVParser.parse(expectedFileSC, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
+            CSVParser expectedParserE = CSVParser.parse(expectedFileE, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
+            CSVParser expectedParserP = CSVParser.parse(expectedFileP, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
+
+            CSVParser actualParser = CSVParser.parse(actualFile, Charset.forName("UTF-8"), CSVFormat.DEFAULT);
+
+            List<CSVRecord> expectedRecordsST = expectedParserST.getRecords();
+            List<CSVRecord> actualRecords = actualParser.getRecords();
+
+            assertEquals(expectedRecordsST.size(), actualRecords.size(), "CSV record count does not match");
+
+            for (int i = 0; i < expectedRecordsST.size(); i++) {
+                CSVRecord expectedRecord = expectedRecordsST.get(i);
+                CSVRecord actualRecord = actualRecords.get(i);
+
+                // Convert the records to strings and remove whitespace for comparison
+                String expectedRecordStr = expectedRecord.toString().replaceAll("\\s+", "");
+                String actualRecordStr = actualRecord.toString().replaceAll("\\s+", "");
+
+                assertEquals(expectedRecordStr, actualRecordStr, "CSV content does not match at row " + (i + 1));
+            }
+
+
+            List<CSVRecord> expectedRecordsSC = expectedParserSC.getRecords();
+
+            assertEquals(expectedRecordsSC.size(), actualRecords.size(), "CSV record count does not match");
+
+            for (int i = 0; i < expectedRecordsSC.size(); i++) {
+                CSVRecord expectedRecord = expectedRecordsSC.get(i);
+                CSVRecord actualRecord = actualRecords.get(i);
+
+                // Convert the records to strings and remove whitespace for comparison
+                String expectedRecordStr = expectedRecord.toString().replaceAll("\\s+", "");
+                String actualRecordStr = actualRecord.toString().replaceAll("\\s+", "");
+
+                assertEquals(expectedRecordStr, actualRecordStr, "CSV content does not match at row " + (i + 1));
+            }
+
+
+            List<CSVRecord> expectedRecordsE = expectedParserE.getRecords();
+
+            assertEquals(expectedRecordsE.size(), actualRecords.size(), "CSV record count does not match");
+
+            for (int i = 0; i < expectedRecordsE.size(); i++) {
+                CSVRecord expectedRecord = expectedRecordsE.get(i);
+                CSVRecord actualRecord = actualRecords.get(i);
+
+                // Convert the records to strings and remove whitespace for comparison
+                String expectedRecordStr = expectedRecord.toString().replaceAll("\\s+", "");
+                String actualRecordStr = actualRecord.toString().replaceAll("\\s+", "");
+
+                assertEquals(expectedRecordStr, actualRecordStr, "CSV content does not match at row " + (i + 1));
+            }
+
+
+            List<CSVRecord> expectedRecordsP = expectedParserP.getRecords();
+
+            assertEquals(expectedRecordsP.size(), actualRecords.size(), "CSV record count does not match");
+
+            for (int i = 0; i < expectedRecordsP.size(); i++) {
+                CSVRecord expectedRecord = expectedRecordsP.get(i);
+                CSVRecord actualRecord = actualRecords.get(i);
+
+                // Convert the records to strings and remove whitespace for comparison
+                String expectedRecordStr = expectedRecord.toString().replaceAll("\\s+", "");
+                String actualRecordStr = actualRecord.toString().replaceAll("\\s+", "");
+
+                assertEquals(expectedRecordStr, actualRecordStr, "CSV content does not match at row " + (i + 1));
+            }
+
+
+        } catch (Exception e) {
+            System.out.println(e);
+
+            fail();
+        }
+    }
+
 
 
 
