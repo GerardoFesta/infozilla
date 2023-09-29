@@ -19,10 +19,12 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.poi.ss.usermodel.*;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -583,6 +585,178 @@ public class SystemTest {
             fail();
         }
     }
+
+    @Test
+    public void tc14() {
+        String[] args = {
+                "--charset", "UTF-8",
+                "./system_testing_inputs/tc14.txt",
+                "-o=xls"
+        };
+        try {
+
+            Main main = new Main();
+            CommandLine.run(main, args);
+            File expectedFileST = new File("./system_testing_oracles/tc14_ST_oracle.xls");
+            File expectedFileSC = new File("./system_testing_oracles/tc14_SC_oracle.xls");
+            File expectedFileE = new File("./system_testing_oracles/tc14_E_oracle.xls");
+            File expectedFileP = new File("./system_testing_oracles/tc14_P_oracle.xls");
+            File actualFileP = new File("./system_testing_inputs/tc14_txt_XLS/tc14_txt_patches.xls");
+            File actualFileE = new File("./system_testing_inputs/tc14_txt_XLS/tc14_txt_enumerations.xls");
+            File actualFileSC = new File("./system_testing_inputs/tc14_txt_XLS/tc14_txt_sourceCode.xls");
+            File actualFileST = new File("./system_testing_inputs/tc14_txt_XLS/tc14_txt_stackTraces.xls");
+
+            FileInputStream expectedFileInputStreamST = new FileInputStream(expectedFileST);
+            FileInputStream expectedFileInputStreamSC = new FileInputStream(expectedFileSC);
+            FileInputStream expectedFileInputStreamE = new FileInputStream(expectedFileE);
+            FileInputStream expectedFileInputStreamP = new FileInputStream(expectedFileP);
+            FileInputStream actualFileInputStreamP = new FileInputStream(actualFileP);
+            FileInputStream actualFileInputStreamE = new FileInputStream(actualFileE);
+            FileInputStream actualFileInputStreamSC = new FileInputStream(actualFileSC);
+            FileInputStream actualFileInputStreamST = new FileInputStream(actualFileST);
+
+            Workbook expectedWorkbookST = WorkbookFactory.create(expectedFileInputStreamST);
+            Workbook expectedWorkbookSC = WorkbookFactory.create(expectedFileInputStreamSC);
+            Workbook expectedWorkbookE = WorkbookFactory.create(expectedFileInputStreamE);
+            Workbook expectedWorkbookP = WorkbookFactory.create(expectedFileInputStreamP);
+            Workbook actualWorkbookP = WorkbookFactory.create(actualFileInputStreamP);
+            Workbook actualWorkbookE = WorkbookFactory.create(actualFileInputStreamE);
+            Workbook actualWorkbookSC = WorkbookFactory.create(actualFileInputStreamSC);
+            Workbook actualWorkbookST = WorkbookFactory.create(actualFileInputStreamST);
+
+            Sheet expectedSheetST = expectedWorkbookST.getSheetAt(0);
+            Sheet expectedSheetSC = expectedWorkbookSC.getSheetAt(0);
+            Sheet expectedSheetE = expectedWorkbookE.getSheetAt(0);
+            Sheet expectedSheetP = expectedWorkbookP.getSheetAt(0);
+            Sheet actualSheetP = actualWorkbookP.getSheetAt(0);
+            Sheet actualSheetE = actualWorkbookE.getSheetAt(0);
+            Sheet actualSheetSC = actualWorkbookSC.getSheetAt(0);
+            Sheet actualSheetST = actualWorkbookST.getSheetAt(0);
+
+            Iterator<Row> expectedRowIteratorST = expectedSheetST.iterator();
+            Iterator<Row> expectedRowIteratorSC = expectedSheetSC.iterator();
+            Iterator<Row> expectedRowIteratorE = expectedSheetE.iterator();
+            Iterator<Row> expectedRowIteratorP = expectedSheetP.iterator();
+            Iterator<Row> actualRowIteratorP = actualSheetP.iterator();
+            Iterator<Row> actualRowIteratorE = actualSheetE.iterator();
+            Iterator<Row> actualRowIteratorSC = actualSheetSC.iterator();
+            Iterator<Row> actualRowIteratorST = actualSheetST.iterator();
+
+            while (expectedRowIteratorST.hasNext() && actualRowIteratorST.hasNext()) {
+                Row expectedRow = expectedRowIteratorST.next();
+                Row actualRow = actualRowIteratorST.next();
+
+                Iterator<Cell> expectedCellIterator = expectedRow.cellIterator();
+                Iterator<Cell> actualCellIterator = actualRow.cellIterator();
+
+                while (expectedCellIterator.hasNext() && actualCellIterator.hasNext()) {
+                    Cell expectedCell = expectedCellIterator.next();
+                    Cell actualCell = actualCellIterator.next();
+
+                    //Ignoro i numeri così da evitare stackTrace timestamp
+                    if (expectedCell.getCellType() == CellType.STRING && actualCell.getCellType() == CellType.STRING) {
+                        String expectedCellValue = expectedCell.getStringCellValue().replaceAll("\\s+", "");
+                        String actualCellValue = actualCell.getStringCellValue().replaceAll("\\s+", "");
+
+                        if (!expectedCellValue.equals(actualCellValue)) {
+                            System.out.println("XLS content does not match at row " + expectedRow.getRowNum() + ", column " + expectedCell.getColumnIndex());
+                            fail();
+                        }
+                    }
+                }
+            }
+
+            while (expectedRowIteratorP.hasNext() && actualRowIteratorP.hasNext()) {
+                Row expectedRow = expectedRowIteratorP.next();
+                Row actualRow = actualRowIteratorP.next();
+
+                Iterator<Cell> expectedCellIterator = expectedRow.cellIterator();
+                Iterator<Cell> actualCellIterator = actualRow.cellIterator();
+
+                while (expectedCellIterator.hasNext() && actualCellIterator.hasNext()) {
+                    Cell expectedCell = expectedCellIterator.next();
+                    Cell actualCell = actualCellIterator.next();
+
+
+                    if (expectedCell.getCellType() == CellType.STRING && actualCell.getCellType() == CellType.STRING) {
+                        String expectedCellValue = expectedCell.getStringCellValue().replaceAll("\\s+", "");
+                        String actualCellValue = actualCell.getStringCellValue().replaceAll("\\s+", "");
+
+                        if (!expectedCellValue.equals(actualCellValue)) {
+                            System.out.println("XLS content does not match at row " + expectedRow.getRowNum() + ", column " + expectedCell.getColumnIndex());
+                            fail();
+                        }
+                    }
+                }
+            }
+
+            while (expectedRowIteratorSC.hasNext() && actualRowIteratorSC.hasNext()) {
+                Row expectedRow = expectedRowIteratorSC.next();
+                Row actualRow = actualRowIteratorSC.next();
+
+                Iterator<Cell> expectedCellIterator = expectedRow.cellIterator();
+                Iterator<Cell> actualCellIterator = actualRow.cellIterator();
+
+                while (expectedCellIterator.hasNext() && actualCellIterator.hasNext()) {
+                    Cell expectedCell = expectedCellIterator.next();
+                    Cell actualCell = actualCellIterator.next();
+
+
+                    if (expectedCell.getCellType() == CellType.STRING && actualCell.getCellType() == CellType.STRING) {
+                        String expectedCellValue = expectedCell.getStringCellValue().replaceAll("\\s+", "");
+                        String actualCellValue = actualCell.getStringCellValue().replaceAll("\\s+", "");
+
+                        if (!expectedCellValue.equals(actualCellValue)) {
+                            System.out.println("XLS content does not match at row " + expectedRow.getRowNum() + ", column " + expectedCell.getColumnIndex());
+                            fail();
+                        }
+                    }
+                }
+            }
+
+            while (expectedRowIteratorE.hasNext() && actualRowIteratorE.hasNext()) {
+                Row expectedRow = expectedRowIteratorE.next();
+                Row actualRow = actualRowIteratorE.next();
+
+                Iterator<Cell> expectedCellIterator = expectedRow.cellIterator();
+                Iterator<Cell> actualCellIterator = actualRow.cellIterator();
+
+                while (expectedCellIterator.hasNext() && actualCellIterator.hasNext()) {
+                    Cell expectedCell = expectedCellIterator.next();
+                    Cell actualCell = actualCellIterator.next();
+
+
+                    if (expectedCell.getCellType() == CellType.STRING && actualCell.getCellType() == CellType.STRING) {
+                        String expectedCellValue = expectedCell.getStringCellValue().replaceAll("\\s+", "");
+                        String actualCellValue = actualCell.getStringCellValue().replaceAll("\\s+", "");
+
+                        if (!expectedCellValue.equals(actualCellValue)) {
+                            System.out.println("XLS content does not match at row " + expectedRow.getRowNum() + ", column " + expectedCell.getColumnIndex());
+                            fail();
+                        }
+                    }
+                }
+            }
+
+
+
+            expectedFileInputStreamST.close();
+            expectedFileInputStreamSC.close();
+            expectedFileInputStreamE.close();
+            expectedFileInputStreamP.close();
+            actualFileInputStreamP.close();
+            actualFileInputStreamE.close();
+            actualFileInputStreamSC.close();
+            actualFileInputStreamST.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+
+
 
 
 
