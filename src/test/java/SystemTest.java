@@ -756,6 +756,80 @@ public class SystemTest {
     }
 
 
+    @Test
+    public void tc15() {
+        try {
+            String[] args = {
+                    "--charset", "UTF-8",
+                    "./system_testing_inputs/tc15.txt",
+                    "-o=json"
+            };
+
+            Main main = new Main();
+            CommandLine.run(main, args);
+
+            // Leggi il contenuto del file JSON atteso
+            String expectedJson = new String(Files.readAllBytes(Paths.get("./system_testing_oracles/tc15_oracle.json")));
+
+            // Leggi il contenuto del file JSON generato dal sistema
+            String actualJson = new String(Files.readAllBytes(Paths.get("./system_testing_inputs/tc15.txt.result.json")));
+
+            // Crea oggetti JSON dai contenuti dei file
+            JSONObject expectedJsonObject = new JSONObject(expectedJson);
+            JSONObject actualJsonObject = new JSONObject(actualJson);
+
+            // Ricerca del campo "StackTraces"
+            if (actualJsonObject.has("StackTraces")) {
+                JSONObject stackTracesObject = actualJsonObject.getJSONObject("StackTraces");
+
+                // Ricerca del campo "Stacktraces" all'interno di "StackTraces"
+                if (stackTracesObject.has("Stacktraces")) {
+                    JSONArray stackTracesArray = stackTracesObject.getJSONArray("Stacktraces");
+
+                    // Itera attraverso gli oggetti JSON all'interno di "Stacktraces"
+                    for (int i = 0; i < stackTracesArray.length(); i++) {
+                        JSONObject stackTrace = stackTracesArray.getJSONObject(i);
+
+                        // Rimuovi il campo "timestamp" da ciascun oggetto "StackTrace"
+                        if (stackTrace.has("timestamp")) {
+                            stackTrace.remove("timestamp");
+                        }
+                    }
+                }
+            }
+// Ricerca del campo "StackTraces"
+            if (expectedJsonObject.has("StackTraces")) {
+                JSONObject stackTracesObject = expectedJsonObject.getJSONObject("StackTraces");
+
+                // Ricerca del campo "Stacktraces" all'interno di "StackTraces"
+                if (stackTracesObject.has("Stacktraces")) {
+                    JSONArray stackTracesArray = stackTracesObject.getJSONArray("Stacktraces");
+
+                    // Itera attraverso gli oggetti JSON all'interno di "Stacktraces"
+                    for (int i = 0; i < stackTracesArray.length(); i++) {
+                        JSONObject stackTrace = stackTracesArray.getJSONObject(i);
+
+                        // Rimuovi il campo "timestamp" da ciascun oggetto "StackTrace"
+                        if (stackTrace.has("timestamp")) {
+                            stackTrace.remove("timestamp");
+                        }
+                    }
+                }
+            }
+            // Confronta gli oggetti JSON
+            assertEquals(actualJsonObject.toString(), expectedJsonObject.toString(), "JSON content does not match");
+
+
+        } catch (Exception e) {
+            System.out.println(e);
+            fail();
+        }
+    }
+
+
+
+
+
 
 
 
