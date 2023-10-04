@@ -5,7 +5,6 @@ import io.kuy.infozilla.filters.FilterEnumeration;
 import io.kuy.infozilla.filters.FilterTextRemover;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.List;
 
@@ -28,6 +27,58 @@ public class FilterEnumerationTest {
         List<Enumeration> charEnums = filterEnumeration.runFilter(inputText);
         assertEquals(0, charEnums.size());
     }
+
+    @Test
+    public void testEmptyInput() {
+        String inputText = "";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(0, enumerations.size());
+    }
+
+    @Test
+    public void testNonStandardEnumSymbols() {
+        String inputText = "A)\n1-\nC]\n";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(0, enumerations.size());
+    }
+
+    @Test
+    public void testMixedEnumsAndItemizations() {
+        String inputText = "A. Item 1\n- Item 2\nB. Item 3\nC. Item 4\n";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(1, enumerations.size());
+    }
+
+    @Test
+    public void testMixedCharAndIEmpty() {
+        String inputText = "A. Item 1\nB. Item 2\nC. Item 3\n \n \nA. Item 2\nB. Item 2\n";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(2, enumerations.size());
+    }
+
+    @Test
+    public void testMixedNumAndIEmpty() {
+        String inputText = "1. Item 1\n2. Item 2\n3. Item 3\n \n \n1. Item 2\n2. Item 2\n";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(2, enumerations.size());
+    }
+    @Test
+    public void testMixedItemizationsAndCharAndItemizations() {
+        String inputText = "- Item 1\n- Item 2\n- Item 3\nA. Item 3\nB. Item 3\n- Item 2\n- Item 2\n";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(3, enumerations.size());
+    }
+
+    @Test
+    public void testInterleavedEnumsAndItemizations() {
+        String inputText = "A. Item 1\n- Item 2\nB. Item 3\n- Item 4\n";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(0, enumerations.size());
+    }
+
+
+
+
     @Test
     public void testGetCharEnums() {
         String inputText = "A. Item 1\nB. Item 2\nC. Item 3";
@@ -244,12 +295,8 @@ public class FilterEnumerationTest {
 
     }
 
-    private FilterTextRemover textRemover;
     @Test
     public void testGetOutputText() {
-        // Crea un mock della classe textRemover
-        textRemover = Mockito.mock(FilterTextRemover.class);
-
         // Crea un'istanza della tua classe
         FilterEnumeration filter = new FilterEnumeration();
         String inputText = "1. Item 1\n2. Item 2\n- Item 3\n- Item 4";
