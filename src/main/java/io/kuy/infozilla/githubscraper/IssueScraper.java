@@ -7,7 +7,7 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 
 public class IssueScraper {
@@ -23,7 +23,7 @@ public class IssueScraper {
 
     }
 
-    public String scrapeIssue(String repo_id, String issue_id, String file_name) throws IOException {
+    private String scrapeIssue(String repo_id, String issue_id, String file_name) throws IOException {
 
         RepositoryId repoId = RepositoryId.createFromId(repo_id);
         IssueService issueService = new IssueService();
@@ -34,10 +34,8 @@ public class IssueScraper {
         boolean isPublic = repository.isPrivate() == false;
 
         if (isPublic) {
-            // Retrieve the issue data
 
-            Issue issue = issueService.getIssue(repoId, issue_id);
-            // Get the body text of the issue and all comments
+            Issue issue = issueService.getIssue(repository, issue_id);
             String issueText = issue.getBody();
             List<Comment> comments = issueService.getComments(repoId, issue.getNumber());
             StringBuilder commentsText = new StringBuilder();
@@ -76,12 +74,20 @@ public class IssueScraper {
     }
 
     private String getRepoIdFromUrl(String url) {
+        if(! ((url.contains("www.github.com") || url.contains("https://github.com") || url.contains("http://github.com")) || url.contains("github.com"))){
+            System.out.println("Invalid URL");
+            return null;
+        }
         System.out.println("Scraping issue: " + url);
         String[] urlParts = url.split("/");
         String repo_id="";
         if(urlParts[0].equalsIgnoreCase("https:") || urlParts[0].equalsIgnoreCase("http:")){
+            if(urlParts.length<7)
+                return null;
             repo_id = urlParts[3] + "/" + urlParts[4];
-        }else if(urlParts[0].equalsIgnoreCase("www.github.com")){
+        }else if(urlParts[0].equalsIgnoreCase("www.github.com") || urlParts[0].equalsIgnoreCase("github.com")){
+            if(urlParts.length<5)
+                return null;
             repo_id = urlParts[1] + "/" + urlParts[2];
         }else{
             System.out.println("Invalid URL");
@@ -91,11 +97,20 @@ public class IssueScraper {
     }
 
     private String getIssueIdFromUrl(String url){
+        if(! ((url.contains("www.github.com") || url.contains("https://github.com") || url.contains("http://github.com")) || url.contains("github.com"))){
+            System.out.println("Invalid URL");
+            return null;
+        }
+
         String[] urlParts = url.split("/");
         String issue_id="";
         if(urlParts[0].equalsIgnoreCase("https:") || urlParts[0].equalsIgnoreCase("http:")){
+            if(urlParts.length<7)
+                return null;
             issue_id = urlParts[6];
-        }else if(urlParts[0].equalsIgnoreCase("www.github.com")){
+        }else if(urlParts[0].equalsIgnoreCase("www.github.com") || urlParts[0].equalsIgnoreCase("github.com")){
+            if(urlParts.length<5)
+                return null;
             issue_id = urlParts[4];
         }else{
             System.out.println("Invalid URL");
@@ -104,5 +119,6 @@ public class IssueScraper {
         return issue_id;
 
     }
+
 
 }

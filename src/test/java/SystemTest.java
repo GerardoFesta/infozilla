@@ -1,4 +1,5 @@
 import io.kuy.infozilla.cli.Main;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ public class SystemTest {
     public void tc1() {
         String[] args = {
                 "--charset", "UTF-8",
-                "./NonExistingFile.txt"
+                "-f", "./NonExistingFile.txt"
         };
 
         Main main = new Main();
@@ -50,7 +51,7 @@ public class SystemTest {
         String[] args = {
                 "-s=abc",
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc1.txt"
+                "-f"," ./system_testing_inputs/tc1.txt"
         };
 
         Main main = new Main();
@@ -75,7 +76,7 @@ public class SystemTest {
         String[] args = {
                 "-s=abc",
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc1.txt"
+                "-f","./system_testing_inputs/tc1.txt"
         };
 
         Main main = new Main();
@@ -100,7 +101,7 @@ public class SystemTest {
         String[] args = {
                 "-s=abc",
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc1.txt"
+                "-f","./system_testing_inputs/tc1.txt"
         };
 
         Main main = new Main();
@@ -125,7 +126,7 @@ public class SystemTest {
         String[] args = {
                 "-p=abc",
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc1.txt"
+                "-f","./system_testing_inputs/tc1.txt"
         };
 
         Main main = new Main();
@@ -149,7 +150,7 @@ public class SystemTest {
     public void tc6() {
         String[] args = {
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc6.txt"
+                "-f","./system_testing_inputs/tc6.txt"
         };
 
         Main main = new Main();
@@ -193,7 +194,7 @@ public class SystemTest {
         String[] args = {
                 "-s=false",
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc7.txt"
+                "-f","./system_testing_inputs/tc7.txt"
         };
 
         Main main = new Main();
@@ -237,7 +238,7 @@ public class SystemTest {
         String[] args = {
                 "-p=false",
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc8.txt"
+                "-f","./system_testing_inputs/tc8.txt"
         };
 
         Main main = new Main();
@@ -281,7 +282,7 @@ public class SystemTest {
         String[] args = {
                 "-l=false",
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc9.txt"
+                "-f","./system_testing_inputs/tc9.txt"
         };
 
         Main main = new Main();
@@ -325,7 +326,7 @@ public class SystemTest {
         String[] args = {
                 "-c=false",
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc10.txt"
+                "-f","./system_testing_inputs/tc10.txt"
         };
 
         Main main = new Main();
@@ -368,7 +369,7 @@ public class SystemTest {
     public void tc11() {
         String[] args = {
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc11.txt"
+                "-f","./system_testing_inputs/tc11.txt"
         };
 
         Main main = new Main();
@@ -411,7 +412,7 @@ public class SystemTest {
     public void tc12() {
         String[] args = {
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc12.txt"
+                "-f","./system_testing_inputs/tc12.txt"
         };
 
         Main main = new Main();
@@ -450,6 +451,70 @@ public class SystemTest {
         }
     }
 
+    //TEST PER URL
+    @Test
+    public void tc16() {
+        String[] args = {
+                "--charset", "UTF-8",
+                "-u", "https://github.com/GerardoFesta/infozilla/issues/14"
+        };
+
+
+        Main main = new Main();
+        CommandLine.run(main, args);
+
+        File expectedFile = new File("./system_testing_oracles/tc16_oracle.xml");
+        File actualFile = new File("./GerardoFesta-infozilla-14Issue.txt.result.xml");
+        try {
+            // Apply XSLT transformation to expectedFile
+            Source expectedXmlSource = new StreamSource(expectedFile);
+            Result transformedExpectedXmlResult = new StreamResult(new File("./system_testing_oracles/tc16_oracle_transformed.xml"));
+            applyXSLTTransformation(expectedXmlSource, transformedExpectedXmlResult);
+
+            // Apply XSLT transformation to actualFile
+            Source actualXmlSource = new StreamSource(actualFile);
+            Result transformedActualXmlResult = new StreamResult(new File("./GerardoFesta-infozilla-14Issue.txt.result_transformed.xml"));
+            applyXSLTTransformation(actualXmlSource, transformedActualXmlResult);
+
+            // Compare transformed files
+            FileReader transformedExpectedReader = new FileReader("./system_testing_oracles/tc16_oracle_transformed.xml");
+            FileReader transformedActualReader = new FileReader("./GerardoFesta-infozilla-14Issue.txt.result_transformed.xml");
+
+            Diff diff = DiffBuilder.compare(Input.fromReader(transformedExpectedReader))
+                    .withTest(Input.fromReader(transformedActualReader))
+                    .ignoreWhitespace()
+                    .ignoreElementContentWhitespace()
+                    .normalizeWhitespace()
+                    .build();
+
+            assertFalse(diff.hasDifferences(), "XML content does not match");
+
+        } catch (Exception e) {
+            System.out.println(e);
+
+            fail();
+        }
+    }
+
+
+    @Test
+    public void tc17() {
+        String[] args = {
+                "--charset", "UTF-8",
+                "-u", "https://just_a_random_link.com/issues/14"
+        };
+
+        try{
+            Main main = new Main();
+            CommandLine.run(main, args);
+            fail();
+        }catch (Exception e){
+            System.out.println("Execution crashed: " + e.getMessage());
+
+        }
+
+    }
+
 
 
 
@@ -464,4 +529,31 @@ public class SystemTest {
         Transformer transformer = factory.newTransformer(new StreamSource(xsltFile));
         transformer.transform(xmlSource, transformedXmlResult);
     }
+
+    @AfterAll
+    public static void deleteTempFiles() {
+        try {
+            // Elimina i file con nome "_oracle_transformed.xml" dalla cartella ./system_testing_oracles/
+            File oracleDirectory = new File("./system_testing_oracles/");
+            File[] oracleFiles = oracleDirectory.listFiles((dir, name) -> name.contains("_oracle_transformed.xml"));
+            if (oracleFiles != null) {
+                for (File file : oracleFiles) {
+                    file.delete();
+                }
+            }
+
+            // Elimina i file con nome ".cleared", ".result" e ".result_transformed" dalla cartella ./system_testing_inputs/
+            File inputsDirectory = new File("./system_testing_inputs/");
+            File[] inputFiles = inputsDirectory.listFiles((dir, name) -> name.contains(".cleaned") || name.contains(".result") || name.contains(".result_transformed"));
+            if (inputFiles != null) {
+                for (File file : inputFiles) {
+                    file.delete();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
