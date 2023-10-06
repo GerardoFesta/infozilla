@@ -223,7 +223,20 @@ public class IssueScraper {
 
                         if (assignee == null || (issue.getAssignee() != null && issue.getAssignee().getLogin().equalsIgnoreCase(assignee))) {
                             if (state == null || issue.getState().equalsIgnoreCase(state)) {
-                                if (labels == null || labels.length == 0 || issue.getLabels().contains(labels)) {
+                                boolean containsLabel = false;
+                                if (labels != null && labels.length > 0) {
+                                    for (String label : labels) {
+                                        for (Label issueLabel : issue.getLabels()) {
+                                            if (issueLabel.getName().equalsIgnoreCase(label)) {
+                                                containsLabel = true;
+                                                break;
+                                            }
+                                        }
+                                        if (containsLabel)
+                                            break;
+                                    }
+                                }
+                                if (labels == null || labels.length == 0 || containsLabel) {
                                     String issue_id = issue.getNumber() + "";
                                     String base_file_name = repo_id.replace("/", "-") + "-" + issue_id + "Issue.txt";
 

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -221,6 +222,46 @@ public class IssueScraperTest {
             fail();
         }
         assertNotNull(paths);
+    }
+
+    @Test
+    void testGetIssuesBySingleLabel(){
+        String url = "github.com/gerardofesta/infozilla";
+        String[] labels = {"bug"};
+        String[] paths = new String[0];
+        try {
+            paths = issueScraper.runRepoScraper(url, null, null, null, null, null, labels, null);
+        } catch (IOException e) {
+            System.out.println(e);
+            fail();
+        }
+        assertNotNull(paths);
+        assertTrue(paths.length >0);
+        assertTrue(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-10Issue.txt")));
+        assertTrue(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-12Issue.txt")));
+        assertTrue(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-1Issue.txt")));
+    }
+
+    @Test
+    void testGetIssuesByMultipleLabels(){
+        String url = "github.com/gerardofesta/infozilla";
+        String[] labels = {"bug", "enhancement"};
+        String[] paths = new String[0];
+        try {
+            paths = issueScraper.runRepoScraper(url, null, null, null, null, null, labels, null);
+        } catch (IOException e) {
+            System.out.println(e);
+            fail();
+        }
+        assertNotNull(paths);
+        assertTrue(paths.length >0);
+        assertTrue(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-3Issue.txt")));
+        assertTrue(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-4Issue.txt")));
+        assertTrue(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-5Issue.txt")));
+        assertTrue(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-9Issue.txt")));
+        assertTrue(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-11Issue.txt")));
+        assertTrue(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-13Issue.txt")));
+        assertTrue(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-14Issue.txt")));
     }
 
 
