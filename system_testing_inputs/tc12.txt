@@ -187,7 +187,6 @@ Index: file_modificato.txt
 +++ file_modificato.txt	(revision 124)
 @@ -1,6 +1,6 @@
 
-
 -Riga originale 1
 -Riga originale 2
 -Riga originale 3
@@ -199,7 +198,7 @@ Index: file_modificato.txt
 +Riga modificata 3
  Riga originale 6
 
- @@ -11,16 +11,16 @@
+@@ -11,16 +11,16 @@
 -Riga originale 11
 -Riga originale 12
 -Riga originale 13
