@@ -206,8 +206,7 @@ public class Main implements Runnable{
         Files.writeString(Path.of(f.getAbsolutePath() + ".result.xml"), xmlDoc, Charset.forName(inputCharset), StandardOpenOption.CREATE );
         break;
       default:
-
-        break;
+        throw new IllegalArgumentException("Opzione di formato non valida.");
     }
 
 
