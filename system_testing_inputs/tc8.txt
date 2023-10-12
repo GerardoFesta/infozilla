@@ -1,3 +1,4 @@
+
 Discussion ECLIPSE BUG 39887
 
 Wassim Melhem 2003-07-10 14:27:07 EDT
@@ -68,29 +69,8 @@ Here is a breakdown of the activities that take place during the plug-in
 import operation:
 
 1. If autobuilding is on, we turn it off.
-
 2. We import all the plug-ins selected in the import wizard and create a Java
-project for each plug-in that contains libraries.  Note that at this step, we
-used to clear the classpath of the freshly created Java project because we
-will correctly set it at a later step.  However, just before we released 2.1,
-Philippe suggested in bug report 34574 that we do not flush the classpath
-completely.  So we stopped flushing the classpath at this point, and this
-introduced the transient error markers that we now see in the Problems view in
-the middle of the operation.  Since these error markers go away later in step
-3 when we set the classpath, we regarded them as benign, yet still annoying,
-intermediary entities.  This step is done in an IWorkspace.run
-(IWorkspaceRunnable, IProgressMonitor) operation.
 
-3. We set the classpath of all the projects that were succesfully imported
-into the workspace. This step has to be done in a subsequent IWorkspace.run
-(IWorkspaceRunnable, IProgressMonitor) operation for an accurate classpath
-computation.  i.e. the Java projects from step 2 have to become part of the
-workspace before we set their classpath.
-
-4.  If we had turned autobuilding off in step 1, we turn it back on and invoke
-a build via PDEPlugin.getWorkspace().build
-(IncrementalProjectBuilder.INCREMENTAL_BUILD,new SubProgressMonitor
-(monitor,1));
 
 Note that after step 2, JDT core and PDE start doing stuff simultaneously and
 competing for CPU (bug 31592).  JDT starts the indexing work, while PDE starts
@@ -201,11 +181,8 @@ Comment 10 Frederic Fusier 2003-09-04 05:19:40 EDT
 Wassim,
 
 - About markers displayed between step 2 and step 3 there's nothing to do on our
-side about it.
 - At the end of step 2, a PRE_AUTO_BUILD event is sent by the
-running operation and processed by our DeltaProcessor which refreshes markers.
 - As project were created in step 2 without classpath, then we correctly create a
-markers for each concerned project that its .classpath cannot be read.
 
 As it seems necessary to keep the two separated operations, I suggest to set
 the classpath to the created project in order to avoid these markers to be
@@ -255,7 +232,6 @@ Index: file_modificato.txt
 +++ file_modificato.txt	(revision 124)
 @@ -1,6 +1,6 @@
 
-
 -Riga originale 1
 -Riga originale 2
 -Riga originale 3
@@ -267,7 +243,7 @@ Index: file_modificato.txt
 +Riga modificata 3
  Riga originale 6
 
- @@ -11,16 +11,16 @@
+@@ -11,16 +11,16 @@
 -Riga originale 11
 -Riga originale 12
 -Riga originale 13
