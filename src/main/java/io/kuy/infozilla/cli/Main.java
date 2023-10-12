@@ -207,12 +207,8 @@ public class Main implements Runnable{
         break;
       default:
         throw new IllegalArgumentException("Opzione di formato non valida.");
+
     }
-
-
-
-
-
 
   }
 
