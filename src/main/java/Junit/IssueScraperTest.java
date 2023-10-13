@@ -240,6 +240,7 @@ public class IssueScraperTest {
         assertTrue(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-10Issue.txt")));
         assertTrue(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-12Issue.txt")));
         assertTrue(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-1Issue.txt")));
+        assertFalse(Arrays.stream(paths).anyMatch(s -> s.contains("gerardofesta-infozilla-2Issue.txt")));
     }
 
     @Test
@@ -275,7 +276,7 @@ public class IssueScraperTest {
 
     @AfterAll
     static void tearDown() {
-        for (int i=1; i<=14; i++) {
+        for (int i=1; i<=30; i++) {
             File file = new File("gerardofesta-infozilla-"+i+"Issue.txt");
             file.delete();
         }

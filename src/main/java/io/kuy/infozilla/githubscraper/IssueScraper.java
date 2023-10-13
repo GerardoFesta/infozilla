@@ -222,7 +222,7 @@ public class IssueScraper {
                     ) {
 
                         if (assignee == null || (issue.getAssignee() != null && issue.getAssignee().getLogin().equalsIgnoreCase(assignee))) {
-                            if (state == null || issue.getState().equalsIgnoreCase(state)) {
+                            if (state == null || issue.getState().equalsIgnoreCase(state) || state.equalsIgnoreCase("all")) {
                                 boolean containsLabel = false;
                                 if (labels != null && labels.length > 0) {
                                     for (String label : labels) {

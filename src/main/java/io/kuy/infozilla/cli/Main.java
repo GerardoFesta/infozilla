@@ -54,6 +54,30 @@ public class Main implements Runnable{
   @Option(names = { "-o", "--output-format" }, description = "Output format (json, xml, xls, etc.)")
   private String outputFormat = "xml"; // Valore predefinito
 
+  @Option(names = {"-ob", "--opened-before"}, description = "Filter issues opened before a date (format: yyyy-MM-dd)")
+  private String openedBefore;
+
+  @Option(names = {"-oa", "--opened-after"}, description = "Filter issues opened after a date (format: yyyy-MM-dd)")
+  private String openedAfter;
+
+  @Option(names = {"-cb", "--closed-before"}, description = "Filter issues closed before a date (format: yyyy-MM-dd)")
+  private String closedBefore;
+
+  @Option(names = {"-ca", "--closed-after"}, description = "Filter issues closed after a date (format: yyyy-MM-dd)")
+  private String closedAfter;
+
+  @Option(names = {"-la", "--label"}, arity = "1..*", description = "Filter issues by labels (format: --label label1 --label label2 --label label3)")
+  private String labels[];
+
+  @Option(names = {"-as", "--assignee"}, description = "Filter issues by assignee (format: --assignee assignee1)")
+  private String assignee;
+
+  @Option(names = {"-st", "--state"}, description = "Filter issues by state (format: --state open)")
+  private String state;
+
+  @Option(names = {"-a", "--all"}, description = "Scrape all issues from a repo URL (format: --all github.com/gerardofesta/infozilla)")
+  private String repo_url;
+
   @Override
   public void run() {
     ArrayList<File> files_from_url = new ArrayList<File>();
@@ -83,6 +107,21 @@ public class Main implements Runnable{
       }
     }
 
+    ArrayList<File> files_from_repo = new ArrayList<File>();
+    String[] paths_from_repo = new String[0];
+    if(repo_url != null){
+      IssueScraper scraper = new IssueScraper();
+      try {
+        paths_from_repo = scraper.runRepoScraper(repo_url, openedBefore, openedAfter, closedBefore, closedAfter, assignee, labels, state);
+        for(String path:paths_from_repo){
+            File f = new File(path);
+            files_from_repo.add(f);
+        }
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
     for (File f : files_from_url) {
       try {
         process(f);
@@ -91,6 +130,16 @@ public class Main implements Runnable{
         System.exit(1);
       }
     }
+
+    for (File f : files_from_repo) {
+      try {
+        process(f);
+      } catch (Exception e) {
+        e.printStackTrace();
+        System.exit(1);
+      }
+    }
+
 
   }
   private static void writeCSVToFile(File folder, String filename, String csvData, String charset) {
