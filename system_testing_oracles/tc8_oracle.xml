@@ -36,13 +36,13 @@
             </Frames>
         </Stacktrace>
     </Stacktraces>
-    <SourceCodeRegions amount="10">
+    <SourceCodeRegions amount="4">
         <source_code type="functioncall">
-            <location start="3438" end="3451"/>
+            <location start="3438" end="3451" />
             <code>(monitor,1));</code>
         </source_code>
         <source_code type="ifstatement">
-            <location start="6038" end="6306"/>
+            <location start="6038" end="6306" />
             <code>if (isJavaProject) {
                 /*IJavaProject jProject = JavaCore.create(project);
                 if (jProject.getRawClasspath() != null
@@ -52,7 +52,7 @@
                 }</code>
         </source_code>
         <source_code type="ifstatement">
-            <location start="6314" end="6516"/>
+            <location start="6314" end="6516" />
             <code>if (isJavaProject) {
                 IJavaProject jProject = JavaCore.create(project);
                 jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
@@ -61,37 +61,13 @@
                 }</code>
         </source_code>
         <source_code type="ifstatement">
-            <location start="7460" end="7662"/>
+            <location start="7460" end="7662" />
             <code>if (isJavaProject) {
                 IJavaProject jProject = JavaCore.create(project);
                 jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
                 monitor);
                 modelIds.add(model.getPluginBase().getId());
                 }</code>
-        </source_code>
-        <source_code type="class">
-            <location start="9653" end="9673"/>
-            <code>public class Main {</code>
-        </source_code>
-        <source_code type="functiondef">
-            <location start="9675" end="9720"/>
-            <code>-    public static void main(String[] args) {</code>
-        </source_code>
-        <source_code type="functiondef">
-            <location start="9721" end="9767"/>
-            <code>+    public static void start(String[] args) {</code>
-        </source_code>
-        <source_code type="assignment">
-            <location start="9768" end="9791"/>
-            <code>int num1 = 10;</code>
-        </source_code>
-        <source_code type="assignment">
-            <location start="9792" end="9815"/>
-            <code>int num2 = 20;</code>
-        </source_code>
-        <source_code type="assignment">
-            <location start="9816" end="9847"/>
-            <code>int sum = num1 + num2;</code>
         </source_code>
     </SourceCodeRegions>
     <Enumerations amount="2">

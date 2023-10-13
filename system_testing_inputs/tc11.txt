@@ -254,8 +254,6 @@ Index: file_modificato.txt
 --- file_modificato.txt	(revision 123)
 +++ file_modificato.txt	(revision 124)
 @@ -1,6 +1,6 @@
-
-
 -Riga originale 1
 -Riga originale 2
 -Riga originale 3
@@ -267,7 +265,7 @@ Index: file_modificato.txt
 +Riga modificata 3
  Riga originale 6
 
- @@ -11,16 +11,16 @@
+@@ -11,16 +11,16 @@
 -Riga originale 11
 -Riga originale 12
 -Riga originale 13
@@ -281,13 +279,14 @@ Index: file_modificato.txt
 
 this is just a random comment to get other things in the report. Thus, here's another patch
 
+
+
+
 diff --git a/file_originale.txt b/file_modificato.txt
 index a1b2c3d..e4f5g6h 100644
 --- a/file_originale.txt
 +++ b/file_modificato.txt
 @@ -1,6 +1,6 @@
- Questo è un file di esempio.
-
 -Riga originale 1
 -Riga originale 2
 -Riga originale 3
