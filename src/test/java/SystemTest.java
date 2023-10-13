@@ -488,7 +488,7 @@ public class SystemTest {
             assertFalse(diff.hasDifferences(), "XML content does not match");
 
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("CRASHED BECAUSE OF"+e);
 
             fail();
         }
