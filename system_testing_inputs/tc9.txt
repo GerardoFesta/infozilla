@@ -262,13 +262,12 @@ Index: main.java
 --- main.java	(revision 123)
 +++ main.java	(revision 124)
 @@ -1,5 +1,5 @@
-public class Main {
-
+ public class Main {
 -    public static void main(String[] args) {
 +    public static void start(String[] args) {
-         int num1 = 10;
-         int num2 = 20;
-         int sum = num1 + num2;
+ int num1 = 10;
+ int num2 = 20;
+ int sum = num1 + num2;
 
 Comment 14 David Audel 2003-10-14 10:13:14 EDT
 Verified.
