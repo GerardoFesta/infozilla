@@ -39,7 +39,7 @@ public class FilterEnumeration implements IFilter {
 		System.err.println(textRemover.getText().substring(start, (end+1)));
 		System.out.println("}}}}" + textRemover.getText() + "{{{{\n\n");*/
 		// Mark this range for deletion
-		textRemover.markForDeletion(start, end+1);
+		textRemover.markForDeletion(start, end);
 	}
 
 	/**
@@ -57,13 +57,13 @@ public class FilterEnumeration implements IFilter {
 		List<String> enumLines = new ArrayList<String>();
 
 		// All lines from start to end added
-		for (int i = startline; i < endline; i++) {
+		for (int i = startline; i < endline +1; i++) {
 			enumLines.add(lines[i]);
 			filterLine(i, text);
 		}
 		// and all lines from endline till the end of the paragraph!
 		int lastline = endline;
-		for (int i = endline; i < lines.length; i++)
+/*		for (int i = endline; i < lines.length; i++)
 			if (lines[i].length() == 0) {
 				break;
 			}
@@ -72,7 +72,7 @@ public class FilterEnumeration implements IFilter {
 				filterLine(i, text);
 				lastline = i;
 			}
-
+*/
 		// Calculate start position
 		int eStart = 0;
 		for (int i=0; i < startline; i++) {
@@ -98,6 +98,7 @@ public class FilterEnumeration implements IFilter {
 	 * @return a List of {@link Enumeration}s
 	 */
 	private List<Enumeration> getCharEnums(String s) {
+		int trovato =0;
 		List<Enumeration> foundEnumerations = new ArrayList<Enumeration>();
 
 		// RegEx for Enumerations Start
@@ -152,11 +153,24 @@ public class FilterEnumeration implements IFilter {
 					// Reset the counters
 					enumStart = i;
 					enumEnd = -1;
-					symbolCount = 0;
+					symbolCount = 1;
 				}
 
 				lastFoundEnumSymbol = foundEnumSymbol;
 				previousEnumLineFound = i;
+			}else{
+				if(symbolCount >= 2){
+					if(line.isEmpty() && trovato==0){
+						enumEnd = i-1;
+						trovato=1;
+					}
+
+
+				}else {
+					enumStart = i + 1;
+					symbolCount = 0;
+					trovato=0;
+				}
 			}
 		}
 
@@ -167,7 +181,10 @@ public class FilterEnumeration implements IFilter {
 		if (enumStart >= 0 && symbolCount > 1) {
 			Enumeration lastEnumeration = createEnumeration(enumStart, enumEnd, s);
 			foundEnumerations.add(lastEnumeration);
+
 		}
+
+
 		// Return the list of found Enumerations!
 		return foundEnumerations;
 	}
@@ -179,7 +196,7 @@ public class FilterEnumeration implements IFilter {
 	 */
 	private List<Enumeration> getNumEnums(String s) {
 		List<Enumeration> foundEnumerations = new ArrayList<Enumeration>();
-
+		int trovato =0;
 		// RegEx for Enumerations Start
 		// like  1 1. 1) 1.) (1) 1-
 		final String regex_EnumStart = "^\\(?([0-9]+)(\\.|\\.\\)|\\)|\\-)[a-zA-Z \t].*";
@@ -237,11 +254,24 @@ public class FilterEnumeration implements IFilter {
 					// Reset the counters
 					enumStart = i;
 					enumEnd = -1;
-					symbolCount = 0;
+					symbolCount = 1;
 				}
 
 				lastFoundEnumSymbol = foundEnumSymbol;
 				previousEnumLineFound = i;
+			}else{
+				if(symbolCount >= 2){
+					if(line.isEmpty() && trovato==0){
+						enumEnd = i-1;
+						trovato=1;
+					}
+
+
+				}else {
+					enumStart = i + 1;
+					symbolCount = 0;
+					trovato=0;
+				}
 			}
 		}
 
@@ -292,23 +322,20 @@ public class FilterEnumeration implements IFilter {
 				lastItemizeEnd = i;
 
 			} else {
-				// If this is no itemization line, then ...
-
-				// if it is an empty line then
-				if (line.length() == 0) {
-					// create an itemization if there are at least 2 itemize items
+				if (!line.startsWith("- ")) {
 					if (itemizeBegin >= 0 && itemizeLineCounter > 1) {
 						// Create a new itemization
 						itemizeEnd = lastItemizeEnd;
+
 						Enumeration itemization = createEnumeration(itemizeBegin, itemizeEnd, s);
 						foundItemizations.add(itemization);
 					}
-					// And reset the counters
 					itemizeBegin = -1;
 					lastItemizeEnd = -1;
 					itemizeEnd = -1;
 					itemizeLineCounter = 0;
 				}
+
 			}
 		}
 
@@ -324,6 +351,7 @@ public class FilterEnumeration implements IFilter {
 		return foundItemizations;
 	}
 
+	/*
 
 	// Still a dummy testing method
 	public void testFilter(String s) {
@@ -371,6 +399,8 @@ public class FilterEnumeration implements IFilter {
 		System.out.println("--------------------------------\n\n");
 
 	}
+
+	 */
 
 	/**
 	 * Runs this method to extract all Character- and Number Enumerations as well as Itemizations

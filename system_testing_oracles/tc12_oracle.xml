@@ -6,7 +6,26 @@
       <original_file>file_modificato.txt</original_file>
       <modified_file>file_modificato.txt</modified_file>
       <Hunks>
-        <hunk />
+        <hunk>-Riga originale 1
+          -Riga originale 2
+          -Riga originale 3
+          +Riga modificata 1
+          +Riga modificata 2
+          +Riga aggiunta 2.5
+          Riga originale 4
+          -Riga originale 5
+          +Riga modificata 3
+          Riga originale 6</hunk>
+        <hunk>-Riga originale 11
+          -Riga originale 12
+          -Riga originale 13
+          +Riga modificata 11
+          +Riga modificata 12
+          +Riga aggiunta 12.5
+          Riga originale 14
+          -Riga originale 15
+          +Riga modificata 13
+          Riga originale 16</hunk>
       </Hunks>
     </Patch>
   </Patches>
@@ -29,33 +48,21 @@
   </Stacktraces>
   <SourceCodeRegions amount="1">
     <source_code type="functioncall">
-      <location start="3368" end="3448" />
+      <location start="2178" end="2258"/>
       <code>(IncrementalProjectBuilder.INCREMENTAL_BUILD,new SubProgressMonitor(monitor,1));</code>
     </source_code>
   </SourceCodeRegions>
-  <Enumerations amount="1">
-    <Enumeration lines="20">
+  <Enumerations amount="2">
+    <Enumeration lines="2">
       <Lines>
         <Line>1. If autobuilding is on, we turn it off.</Line>
-        <Line />
         <Line>2. We import all the plug-ins selected in the import wizard and create a Java</Line>
-        <Line>project for each plug-in that contains libraries.  Note that at this step, we</Line>
-        <Line>used to clear the classpath of the freshly created Java project because we</Line>
-        <Line>will correctly set it at a later step.  However, just before we released 2.1,</Line>
-        <Line>Philippe suggested in bug report 34574 that we do not flush the classpath</Line>
-        <Line>completely.  So we stopped flushing the classpath at this point, and this</Line>
-        <Line>introduced the transient error markers that we now see in the Problems view in</Line>
-        <Line>the middle of the operation.  Since these error markers go away later in step</Line>
-        <Line>3 when we set the classpath, we regarded them as benign, yet still annoying,</Line>
-        <Line>intermediary entities.  This step is done in an IWorkspace.run(IWorkspaceRunnable, IProgressMonitor) operation.</Line>
-        <Line />
-        <Line>3. We set the classpath of all the projects that were succesfully imported</Line>
-        <Line>into the workspace. This step has to be done in a subsequent IWorkspace.run(IWorkspaceRunnable, IProgressMonitor)</Line>
-        <Line>operation for an accurate classpath computation.</Line>
-        <Line>i.e. the Java projects from step 2 have to become part of the workspace before we set their classpath.</Line>
-        <Line />
-        <Line>4.  If we had turned autobuilding off in step 1, we turn it back on and invoke</Line>
-        <Line>a build via PDEPlugin.getWorkspace().build</Line>
+      </Lines>
+    </Enumeration>
+    <Enumeration lines="2">
+      <Lines>
+        <Line>1) perform the import in only one operation as suggested by bug 31592</Line>
+        <Line>2) add a temporary .classpth to the project to avoid markers creation while</Line>
       </Lines>
     </Enumeration>
   </Enumerations>

@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<infozilla-output>
-    <Patches amount="0" />
+<?xml version="1.0" encoding="UTF-8"?><infozilla-output>
+    <Patches amount="0"/>
     <Stacktraces amount="2">
-        <Stacktrace timestamp="1692713384315">
+        <Stacktrace timestamp="0">
             <Exception>org.eclipse.core.internal.resources.ResourceException</Exception>
             <Reason>:
                 Resource /org.eclipse.debug.core/.classpath is not local.</Reason>
@@ -17,7 +16,7 @@
                 <Frame depth="7">org.eclipse.jdt.internal.core.search.processing.JobManager.run(JobManager.java:371)</Frame>
             </Frames>
         </Stacktrace>
-        <Stacktrace timestamp="1692713384315">
+        <Stacktrace timestamp="0">
             <Exception>org.eclipse.core.internal.resources.ResourceException</Exception>
             <Reason>:
                 Resource /org.eclipse.jdt.launching/.classpath is not local.</Reason>
@@ -36,13 +35,9 @@
             </Frames>
         </Stacktrace>
     </Stacktraces>
-    <SourceCodeRegions amount="10">
-        <source_code type="functioncall">
-            <location start="3438" end="3451"/>
-            <code>(monitor,1));</code>
-        </source_code>
+    <SourceCodeRegions amount="9">
         <source_code type="ifstatement">
-            <location start="6038" end="6306"/>
+            <location start="4764" end="5032"/>
             <code>if (isJavaProject) {
                 /*IJavaProject jProject = JavaCore.create(project);
                 if (jProject.getRawClasspath() != null
@@ -52,7 +47,7 @@
                 }</code>
         </source_code>
         <source_code type="ifstatement">
-            <location start="6314" end="6516"/>
+            <location start="5040" end="5242"/>
             <code>if (isJavaProject) {
                 IJavaProject jProject = JavaCore.create(project);
                 jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
@@ -61,7 +56,7 @@
                 }</code>
         </source_code>
         <source_code type="ifstatement">
-            <location start="7460" end="7662"/>
+            <location start="6021" end="6223"/>
             <code>if (isJavaProject) {
                 IJavaProject jProject = JavaCore.create(project);
                 jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
@@ -70,68 +65,49 @@
                 }</code>
         </source_code>
         <source_code type="class">
-            <location start="9653" end="9673"/>
+            <location start="8212" end="8232"/>
             <code>public class Main {</code>
         </source_code>
         <source_code type="functiondef">
-            <location start="9675" end="9720"/>
+            <location start="8233" end="8278"/>
             <code>-    public static void main(String[] args) {</code>
         </source_code>
         <source_code type="functiondef">
-            <location start="9721" end="9767"/>
+            <location start="8279" end="8325"/>
             <code>+    public static void start(String[] args) {</code>
         </source_code>
         <source_code type="assignment">
-            <location start="9768" end="9791"/>
+            <location start="8326" end="8341"/>
             <code>int num1 = 10;</code>
         </source_code>
         <source_code type="assignment">
-            <location start="9792" end="9815"/>
+            <location start="8342" end="8357"/>
             <code>int num2 = 20;</code>
         </source_code>
         <source_code type="assignment">
-            <location start="9816" end="9847"/>
+            <location start="8358" end="8381"/>
             <code>int sum = num1 + num2;</code>
         </source_code>
     </SourceCodeRegions>
-    <Enumerations amount="2">
-        <Enumeration lines="23">
+    <Enumerations amount="3">
+        <Enumeration lines="2">
             <Lines>
                 <Line>1. If autobuilding is on, we turn it off.</Line>
-                <Line />
                 <Line>2. We import all the plug-ins selected in the import wizard and create a Java</Line>
-                <Line>project for each plug-in that contains libraries.  Note that at this step, we</Line>
-                <Line>used to clear the classpath of the freshly created Java project because we</Line>
-                <Line>will correctly set it at a later step.  However, just before we released 2.1,</Line>
-                <Line>Philippe suggested in bug report 34574 that we do not flush the classpath</Line>
-                <Line>completely.  So we stopped flushing the classpath at this point, and this</Line>
-                <Line>introduced the transient error markers that we now see in the Problems view in</Line>
-                <Line>the middle of the operation.  Since these error markers go away later in step</Line>
-                <Line>3 when we set the classpath, we regarded them as benign, yet still annoying,</Line>
-                <Line>intermediary entities.  This step is done in an IWorkspace.run</Line>
-                <Line>(IWorkspaceRunnable, IProgressMonitor) operation.</Line>
-                <Line />
-                <Line>3. We set the classpath of all the projects that were succesfully imported</Line>
-                <Line>into the workspace. This step has to be done in a subsequent IWorkspace.run</Line>
-                <Line>(IWorkspaceRunnable, IProgressMonitor) operation for an accurate classpath</Line>
-                <Line>computation.  i.e. the Java projects from step 2 have to become part of the</Line>
-                <Line>workspace before we set their classpath.</Line>
-                <Line />
-                <Line>4.  If we had turned autobuilding off in step 1, we turn it back on and invoke</Line>
-                <Line>a build via PDEPlugin.getWorkspace().build</Line>
-                <Line>(IncrementalProjectBuilder.INCREMENTAL_BUILD,new SubProgressMonitor</Line>
             </Lines>
         </Enumeration>
-        <Enumeration lines="6">
+        <Enumeration lines="2">
+            <Lines>
+                <Line>1) perform the import in only one operation as suggested by bug 31592</Line>
+                <Line>2) add a temporary .classpth to the project to avoid markers creation while</Line>
+            </Lines>
+        </Enumeration>
+        <Enumeration lines="3">
             <Lines>
                 <Line>- About markers displayed between step 2 and step 3 there's nothing to do on our</Line>
-                <Line>side about it.</Line>
                 <Line>- At the end of step 2, a PRE_AUTO_BUILD event is sent by the</Line>
-                <Line>running operation and processed by our DeltaProcessor which refreshes markers.</Line>
                 <Line>- As project were created in step 2 without classpath, then we correctly create a</Line>
-                <Line>markers for each concerned project that its .classpath cannot be read.</Line>
             </Lines>
         </Enumeration>
     </Enumerations>
 </infozilla-output>
-
