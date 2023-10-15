@@ -47,7 +47,7 @@
     <Stacktraces amount="0"/>
     <SourceCodeRegions amount="3">
         <source_code type="ifstatement">
-            <location start="6038" end="6306" />
+            <location start="6577" end="6845"/>
             <code>if (isJavaProject) {
                 /*IJavaProject jProject = JavaCore.create(project);
                 if (jProject.getRawClasspath() != null
@@ -57,7 +57,7 @@
                 }</code>
         </source_code>
         <source_code type="ifstatement">
-            <location start="6314" end="6516" />
+            <location start="6853" end="7055"/>
             <code>if (isJavaProject) {
                 IJavaProject jProject = JavaCore.create(project);
                 jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
@@ -66,7 +66,7 @@
                 }</code>
         </source_code>
         <source_code type="ifstatement">
-            <location start="7460" end="7662" />
+            <location start="7834" end="8036"/>
             <code>if (isJavaProject) {
                 IJavaProject jProject = JavaCore.create(project);
                 jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
