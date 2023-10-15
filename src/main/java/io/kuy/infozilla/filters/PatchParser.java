@@ -38,11 +38,12 @@ public class PatchParser {
 
 					}
 				}
-			}
-			// Check if the following line starts with "--- " and "+++ " indicating a unified diff section
-			else if (lines[i].startsWith("diff --git") && lines[i + 1].startsWith("index ") && lines[i + 2].startsWith("--- ") && lines[i + 3].startsWith("+++ ")) {
-				found = i;
-				break;
+
+				// Check if the following line starts with "--- " and "+++ " indicating a unified diff section
+				else if (lines[i].startsWith("diff --git") && lines[i + 1].startsWith("index ") && lines[i + 2].startsWith("--- ") && lines[i + 3].startsWith("+++ ")) {
+					found = i;
+					break;
+				}
 			}
 
 		}
@@ -279,7 +280,7 @@ public class PatchParser {
 			}
 
 			// Find the first Hunk Header
-			int    pModiNum = findFirstLineBeginningWith("+++ ", lines, 0);
+			int pModiNum = findFirstLineBeginningWith("+++ ", lines, 0);
 			int firstHunkLine = findNextHunkHeader(lines, pModiNum + 1);
 
 			// If there is no Hunk then the patch is invalid!
