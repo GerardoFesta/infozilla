@@ -6,52 +6,83 @@
       <original_file>file_modificato.txt</original_file>
       <modified_file>file_modificato.txt</modified_file>
       <Hunks>
-        <hunk>-Riga originale 1
-          -Riga originale 2
-          -Riga originale 3
-          +Riga modificata 1
-          +Riga modificata 2
-          +Riga aggiunta 2.5
-          Riga originale 4
-          -Riga originale 5
-          +Riga modificata 3
+        <hunk>-Riga originale 1&#xD;
+          &#xD;
+          -Riga originale 2&#xD;
+          &#xD;
+          -Riga originale 3&#xD;
+          &#xD;
+          +Riga modificata 1&#xD;
+          &#xD;
+          +Riga modificata 2&#xD;
+          &#xD;
+          +Riga aggiunta 2.5&#xD;
+          &#xD;
+          Riga originale 4&#xD;
+          &#xD;
+          -Riga originale 5&#xD;
+          &#xD;
+          +Riga modificata 3&#xD;
+          &#xD;
           Riga originale 6</hunk>
-        <hunk>-Riga originale 11
-          -Riga originale 12
-          -Riga originale 13
-          +Riga modificata 11
-          +Riga modificata 12
-          +Riga aggiunta 12.5
-          Riga originale 14
-          -Riga originale 15
-          +Riga modificata 13
+        <hunk>-Riga originale 11&#xD;
+          &#xD;
+          -Riga originale 12&#xD;
+          &#xD;
+          -Riga originale 13&#xD;
+          &#xD;
+          +Riga modificata 11&#xD;
+          &#xD;
+          +Riga modificata 12&#xD;
+          &#xD;
+          +Riga aggiunta 12.5&#xD;
+          &#xD;
+          Riga originale 14&#xD;
+          &#xD;
+          -Riga originale 15&#xD;
+          &#xD;
+          +Riga modificata 13&#xD;
+          &#xD;
           Riga originale 16</hunk>
       </Hunks>
     </Patch>
     <Patch>
-      <index />
-      <original_file>a/file_modificato.txt</original_file>
-      <modified_file>b/file_modificato.txt</modified_file>
+      <index>1b2c3d..e4f5g6h 100644</index>
+      <original_file>--- a/file_originale.txt</original_file>
+      <modified_file>+++ b/file_modificato.txt</modified_file>
       <Hunks>
-        <hunk />
-        <hunk>Questo è un file di esempio.</hunk>
-        <hunk>-Riga originale 1
-          -Riga originale 2
-          -Riga originale 3
-          +Riga modificata 1
-          +Riga modificata 2
-          +Riga aggiunta 2.5
-          Riga originale 4
-          -Riga originale 5
-          +Riga modificata 3
-          Riga originale 6
-          Riga originale 7
+        <hunk>Questo è un file di esempio.&#xD;
+          &#xD;
+          &#xD;
+          &#xD;
+          -Riga originale 1&#xD;
+          &#xD;
+          -Riga originale 2&#xD;
+          &#xD;
+          -Riga originale 3&#xD;
+          &#xD;
+          +Riga modificata 1&#xD;
+          &#xD;
+          +Riga modificata 2&#xD;
+          &#xD;
+          +Riga aggiunta 2.5&#xD;
+          &#xD;
+          Riga originale 4&#xD;
+          &#xD;
+          -Riga originale 5&#xD;
+          &#xD;
+          +Riga modificata 3&#xD;
+          &#xD;
+          Riga originale 6&#xD;
+          &#xD;
+          Riga originale 7&#xD;
+          &#xD;
           Riga originale 8</hunk>
       </Hunks>
     </Patch>
   </Patches>
   <Stacktraces amount="2">
-    <Stacktrace timestamp="1692713384315">
+    <Stacktrace timestamp="1697365780945">
       <Exception>org.eclipse.core.internal.resources.ResourceException</Exception>
       <Reason>:
         Resource /org.eclipse.debug.core/.classpath is not local.</Reason>
@@ -66,7 +97,7 @@
         <Frame depth="7">org.eclipse.jdt.internal.core.search.processing.JobManager.run(JobManager.java:371)</Frame>
       </Frames>
     </Stacktrace>
-    <Stacktrace timestamp="1692713384315">
+    <Stacktrace timestamp="1697365780945">
       <Exception>org.eclipse.core.internal.resources.ResourceException</Exception>
       <Reason>:
         Resource /org.eclipse.jdt.launching/.classpath is not local.</Reason>
@@ -85,13 +116,9 @@
       </Frames>
     </Stacktrace>
   </Stacktraces>
-  <SourceCodeRegions amount="4">
-    <source_code type="functioncall">
-      <location start="3438" end="3451" />
-      <code>(monitor,1));</code>
-    </source_code>
+  <SourceCodeRegions amount="3">
     <source_code type="ifstatement">
-      <location start="6038" end="6306" />
+      <location start="4764" end="5032" />
       <code>if (isJavaProject) {
         /*IJavaProject jProject = JavaCore.create(project);
         if (jProject.getRawClasspath() != null
@@ -101,7 +128,7 @@
         }</code>
     </source_code>
     <source_code type="ifstatement">
-      <location start="6314" end="6516" />
+      <location start="5040" end="5242" />
       <code>if (isJavaProject) {
         IJavaProject jProject = JavaCore.create(project);
         jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
@@ -110,7 +137,7 @@
         }</code>
     </source_code>
     <source_code type="ifstatement">
-      <location start="7460" end="7662" />
+      <location start="6021" end="6223" />
       <code>if (isJavaProject) {
         IJavaProject jProject = JavaCore.create(project);
         jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
