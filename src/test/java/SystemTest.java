@@ -830,6 +830,49 @@ public class SystemTest {
         }
     }
 
+    @Test
+    public void tc16() {
+        String[] args = {
+                "--charset", "UTF-8",
+                "./system_testing_inputs/tc16.txt",
+                "-o=xml"
+        };
+
+        Main main = new Main();
+        CommandLine.run(main, args);
+
+        File expectedFile = new File("./system_testing_oracles/tc16_oracle.xml");
+        File actualFile = new File("./system_testing_inputs/tc16.txt.result.xml");
+        try {
+            // Apply XSLT transformation to expectedFile
+            Source expectedXmlSource = new StreamSource(expectedFile);
+            Result transformedExpectedXmlResult = new StreamResult(new File("./system_testing_oracles/tc16_oracle_transformed.xml"));
+            applyXSLTTransformation(expectedXmlSource, transformedExpectedXmlResult);
+
+            // Apply XSLT transformation to actualFile
+            Source actualXmlSource = new StreamSource(actualFile);
+            Result transformedActualXmlResult = new StreamResult(new File("./system_testing_inputs/tc16.txt.result_transformed.xml"));
+            applyXSLTTransformation(actualXmlSource, transformedActualXmlResult);
+
+            // Compare transformed files
+            FileReader transformedExpectedReader = new FileReader("./system_testing_oracles/tc16_oracle_transformed.xml");
+            FileReader transformedActualReader = new FileReader("./system_testing_inputs/tc16.txt.result_transformed.xml");
+
+            Diff diff = DiffBuilder.compare(Input.fromReader(transformedExpectedReader))
+                    .withTest(Input.fromReader(transformedActualReader))
+                    .ignoreWhitespace()
+                    .ignoreElementContentWhitespace()
+                    .normalizeWhitespace()
+                    .build();
+
+            assertFalse(diff.hasDifferences(), "XML content does not match");
+
+        } catch (Exception e) {
+            System.out.println(e);
+
+            fail();
+        }
+    }
 
 
     @Test
