@@ -45,11 +45,7 @@
     </Patches>
 
     <Stacktraces amount="0"/>
-    <SourceCodeRegions amount="4">
-        <source_code type="functioncall">
-            <location start="3438" end="3451" />
-            <code>(monitor,1));</code>
-        </source_code>
+    <SourceCodeRegions amount="3">
         <source_code type="ifstatement">
             <location start="6038" end="6306" />
             <code>if (isJavaProject) {
