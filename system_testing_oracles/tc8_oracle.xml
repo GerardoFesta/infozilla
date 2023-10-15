@@ -1,50 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<infozilla-output>
-    <Patches amount="2">
-        <Patch>
-            <index>file_modificato.txt</index>
-            <original_file>file_modificato.txt</original_file>
-            <modified_file>file_modificato.txt</modified_file>
-            <Hunks>
-                <hunk>-Riga originale 1
-                    -Riga originale 2
-                    -Riga originale 3
-                    +Riga modificata 1
-                    +Riga modificata 2
-                    +Riga aggiunta 2.5
-                    Riga originale 4
-                    -Riga originale 5
-                    +Riga modificata 3
-                    Riga originale 6</hunk>
-                <hunk>-Riga originale 11
-                    -Riga originale 12
-                    -Riga originale 13
-                    +Riga modificata 11
-                    +Riga modificata 12
-                    +Riga aggiunta 12.5
-                    Riga originale 14
-                    -Riga originale 15
-                    +Riga modificata 13
-                    Riga originale 16</hunk>
-            </Hunks>
-        </Patch>
-        <Patch>
-            <index>main.java</index>
-            <original_file>main.java</original_file>
-            <modified_file>main.java</modified_file>
-            <Hunks>
-                <hunk>public class Main {
-
-                    -    public static void main(String[] args) {
-                    +    public static void start(String[] args) {
-                    int num1 = 10;
-                    int num2 = 20;
-                    int sum = num1 + num2;</hunk>
-            </Hunks>
-        </Patch>
-    </Patches>
+<?xml version="1.0" encoding="UTF-8"?><infozilla-output>
+    <Patches amount="0"/>
     <Stacktraces amount="2">
-        <Stacktrace timestamp="1692713384315">
+        <Stacktrace timestamp="0">
             <Exception>org.eclipse.core.internal.resources.ResourceException</Exception>
             <Reason>:
                 Resource /org.eclipse.debug.core/.classpath is not local.</Reason>
@@ -59,7 +16,7 @@
                 <Frame depth="7">org.eclipse.jdt.internal.core.search.processing.JobManager.run(JobManager.java:371)</Frame>
             </Frames>
         </Stacktrace>
-        <Stacktrace timestamp="1692713384315">
+        <Stacktrace timestamp="0">
             <Exception>org.eclipse.core.internal.resources.ResourceException</Exception>
             <Reason>:
                 Resource /org.eclipse.jdt.launching/.classpath is not local.</Reason>
@@ -78,13 +35,9 @@
             </Frames>
         </Stacktrace>
     </Stacktraces>
-    <SourceCodeRegions amount="4">
-        <source_code type="functioncall">
-            <location start="3438" end="3451" />
-            <code>(monitor,1));</code>
-        </source_code>
+    <SourceCodeRegions amount="9">
         <source_code type="ifstatement">
-            <location start="6038" end="6306" />
+            <location start="4764" end="5032"/>
             <code>if (isJavaProject) {
                 /*IJavaProject jProject = JavaCore.create(project);
                 if (jProject.getRawClasspath() != null
@@ -94,7 +47,7 @@
                 }</code>
         </source_code>
         <source_code type="ifstatement">
-            <location start="6314" end="6516" />
+            <location start="5040" end="5242"/>
             <code>if (isJavaProject) {
                 IJavaProject jProject = JavaCore.create(project);
                 jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
@@ -103,13 +56,37 @@
                 }</code>
         </source_code>
         <source_code type="ifstatement">
-            <location start="7460" end="7662" />
+            <location start="6021" end="6223"/>
             <code>if (isJavaProject) {
                 IJavaProject jProject = JavaCore.create(project);
                 jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
                 monitor);
                 modelIds.add(model.getPluginBase().getId());
                 }</code>
+        </source_code>
+        <source_code type="class">
+            <location start="8212" end="8232"/>
+            <code>public class Main {</code>
+        </source_code>
+        <source_code type="functiondef">
+            <location start="8233" end="8278"/>
+            <code>-    public static void main(String[] args) {</code>
+        </source_code>
+        <source_code type="functiondef">
+            <location start="8279" end="8325"/>
+            <code>+    public static void start(String[] args) {</code>
+        </source_code>
+        <source_code type="assignment">
+            <location start="8326" end="8341"/>
+            <code>int num1 = 10;</code>
+        </source_code>
+        <source_code type="assignment">
+            <location start="8342" end="8357"/>
+            <code>int num2 = 20;</code>
+        </source_code>
+        <source_code type="assignment">
+            <location start="8358" end="8381"/>
+            <code>int sum = num1 + num2;</code>
         </source_code>
     </SourceCodeRegions>
     <Enumerations amount="3">
@@ -134,4 +111,3 @@
         </Enumeration>
     </Enumerations>
 </infozilla-output>
-
