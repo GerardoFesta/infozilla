@@ -68,26 +68,8 @@ Here is a breakdown of the activities that take place during the plug-in
 import operation:
 
 1. If autobuilding is on, we turn it off.
-
 2. We import all the plug-ins selected in the import wizard and create a Java
-project for each plug-in that contains libraries.  Note that at this step, we
-used to clear the classpath of the freshly created Java project because we
-will correctly set it at a later step.  However, just before we released 2.1,
-Philippe suggested in bug report 34574 that we do not flush the classpath
-completely.  So we stopped flushing the classpath at this point, and this
-introduced the transient error markers that we now see in the Problems view in
-the middle of the operation.  Since these error markers go away later in step
-3 when we set the classpath, we regarded them as benign, yet still annoying,
-intermediary entities.  This step is done in an IWorkspace.run(IWorkspaceRunnable, IProgressMonitor); operation.
 
-3. We set the classpath of all the projects that were succesfully imported
-into the workspace. This step has to be done in a subsequent IWorkspace.run(IWorkspaceRunnable, IProgressMonitor);
-operation for an accurate classpath computation.
-i.e. the Java projects from step 2 have to become part of the workspace before we set their classpath.
-
-4.  If we had turned autobuilding off in step 1, we turn it back on and invoke
-a build via PDEPlugin.getWorkspace().build
-(IncrementalProjectBuilder.INCREMENTAL_BUILD,new SubProgressMonitor(monitor,1));
 
 Note that after step 2, JDT core and PDE start doing stuff simultaneously and
 competing for CPU (bug 31592).  JDT starts the indexing work, while PDE starts

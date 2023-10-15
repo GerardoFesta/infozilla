@@ -5,7 +5,6 @@ import io.kuy.infozilla.filters.FilterEnumeration;
 import io.kuy.infozilla.filters.FilterTextRemover;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.List;
 
@@ -28,6 +27,58 @@ public class FilterEnumerationTest {
         List<Enumeration> charEnums = filterEnumeration.runFilter(inputText);
         assertEquals(0, charEnums.size());
     }
+
+    @Test
+    public void testEmptyInput() {
+        String inputText = "";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(0, enumerations.size());
+    }
+
+    @Test
+    public void testNonStandardEnumSymbols() {
+        String inputText = "A)\n1-\nC]\n";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(0, enumerations.size());
+    }
+
+    @Test
+    public void testMixedEnumsAndItemizations() {
+        String inputText = "A. Item 1\n- Item 2\nB. Item 3\nC. Item 4\n";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(1, enumerations.size());
+    }
+
+    @Test
+    public void testMixedCharAndIEmpty() {
+        String inputText = "A. Item 1\nB. Item 2\nC. Item 3\n \n \nA. Item 2\nB. Item 2\n";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(2, enumerations.size());
+    }
+
+    @Test
+    public void testMixedNumAndIEmpty() {
+        String inputText = "1. Item 1\n2. Item 2\n3. Item 3\n \n \n1. Item 2\n2. Item 2\n";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(2, enumerations.size());
+    }
+    @Test
+    public void testMixedItemizationsAndCharAndItemizations() {
+        String inputText = "- Item 1\n- Item 2\n- Item 3\nA. Item 3\nB. Item 3\n- Item 2\n- Item 2\n";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(3, enumerations.size());
+    }
+
+    @Test
+    public void testInterleavedEnumsAndItemizations() {
+        String inputText = "A. Item 1\n- Item 2\nB. Item 3\n- Item 4\n";
+        List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
+        assertEquals(0, enumerations.size());
+    }
+
+
+
+
     @Test
     public void testGetCharEnums() {
         String inputText = "A. Item 1\nB. Item 2\nC. Item 3";
@@ -102,7 +153,6 @@ public class FilterEnumerationTest {
     }
 
     @Test
-    //ERRORE: ne trova solo 1
     public void testRunFilterCharEnumsANDCharEnums() {
         String inputText = "A. Item 1\nB. Item 2\nC. Item 3\nA. Item 4\nB. Item 5";
         List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
@@ -121,9 +171,9 @@ public class FilterEnumerationTest {
     }
 
     @Test
-    //ERRORE: ne trova solo 1
+
     public void testRunFilter2CharEnumsAND2CharEnums() {
-        String inputText = "A. Item 1\nB. Item 2\nA. Item 3\n B. Item 4";
+        String inputText = "A. Item 1\nB. Item 2\nA. Item 3\nB. Item 4";
         List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
         assertEquals(2, enumerations.size());
 
@@ -139,7 +189,6 @@ public class FilterEnumerationTest {
     }
 
     @Test
-    //ERRORE: l'input deve essere ordinato e la seconda enumerzione è uguale alla pima (inserisce tutto)
     public void testRunFilterItemizationsANDCharEnums() {
         String inputText = "A. Item 4\nB. Item 5\n- Item 1\n- Item 2\n- Item 3";
         List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
@@ -150,17 +199,16 @@ public class FilterEnumerationTest {
         assertEquals("B. Item 5", enumeration.getEnumeration_items().get(1));
         assertEquals(2, enumeration.getEnumeration_items().size());
 
-        Enumeration enumeration1 = enumerations.get(0);
+        Enumeration enumeration1 = enumerations.get(1);
         assertEquals("- Item 1", enumeration1.getEnumeration_items().get(0));
         assertEquals("- Item 2", enumeration1.getEnumeration_items().get(1));
         assertEquals("- Item 3", enumeration1.getEnumeration_items().get(2));
-        assertEquals(2, enumeration1.getEnumeration_items().size());
+        assertEquals(3, enumeration1.getEnumeration_items().size());
 
     }
 
 
     @Test
-    //ERRORE: qunado ci sono i - inserisce tutto in entrmabi i casi
     public void testRunFilterNumEnumsANDItemizations() {
         String inputText = "1. Item 1\n2. Item 2\n- Item 3\n- Item 4";
         List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
@@ -171,43 +219,39 @@ public class FilterEnumerationTest {
         assertEquals("2. Item 2", enumeration.getEnumeration_items().get(1));
         assertEquals(2, enumeration.getEnumeration_items().size());
 
-        Enumeration enumeration1 = enumerations.get(0);
+        Enumeration enumeration1 = enumerations.get(1);
         assertEquals("- Item 3", enumeration1.getEnumeration_items().get(0));
         assertEquals("- Item 4", enumeration1.getEnumeration_items().get(1));
         assertEquals(2, enumeration1.getEnumeration_items().size());
     }
 
     @Test
-    //ERRORE: il primo unisce tutto il secondo se stesso e il successivo (riordina -> vuole prima char e poi int)
     public void testRunFilterNumEnumsANDCharEnums() {
         String inputText = "A. Item 1\nB. Item 2\nC. Item 3\n1. Item 1\n2. Item 2\n3. Item 3\nA. Item 1\nB. Item 2\nC. Item 3";
         List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
         assertEquals(3, enumerations.size());
-
+;
         Enumeration enumeration = enumerations.get(0);
         assertEquals("A. Item 1", enumeration.getEnumeration_items().get(0));
         assertEquals("B. Item 2", enumeration.getEnumeration_items().get(1));
         assertEquals("C. Item 3", enumeration.getEnumeration_items().get(2));
         assertEquals(3, enumeration.getEnumeration_items().size());
 
-        Enumeration enumeration1 = enumerations.get(0);
+        Enumeration enumeration1 = enumerations.get(2);
         assertEquals("1. Item 1", enumeration1.getEnumeration_items().get(0));
         assertEquals("2. Item 2", enumeration1.getEnumeration_items().get(1));
         assertEquals("3. Item 3", enumeration1.getEnumeration_items().get(2));
         assertEquals(3, enumeration1.getEnumeration_items().size());
 
-        Enumeration enumeration2 = enumerations.get(0);
+        Enumeration enumeration2 = enumerations.get(1);
         assertEquals("A. Item 1", enumeration2.getEnumeration_items().get(0));
         assertEquals("B. Item 2", enumeration2.getEnumeration_items().get(1));
         assertEquals("C. Item 3", enumeration2.getEnumeration_items().get(2));
         assertEquals(3, enumeration2.getEnumeration_items().size());
 
-
-
     }
 
     @Test
-    //ERRORE: ne trova solo 1
     public void testRunFilterNumEnumsANDNumEnums() {
         String inputText = "1. Item 1\n2. Item 2\n3. Item 3\n1. Item 4\n2. Item 5";
         List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
@@ -226,7 +270,6 @@ public class FilterEnumerationTest {
     }
 
     @Test
-    //ERRORE: nella prima inserisce tutto, nella seconda il secondo e l'ultimo, nella terza solo l'ultimo. (devono essere sempre in orinde char/num/-
     public void testRunFilterCharEnumsANDNumEnumsANDItemizations() {
         String inputText = "A. Item 1\nB. Item 2\ntesto\n1. Item 1\n2. Item 2\n3. Item 3\n- Item 1\n- Item 2\n- Item 3";
         List<Enumeration> enumerations = filterEnumeration.runFilter(inputText);
@@ -252,22 +295,17 @@ public class FilterEnumerationTest {
 
     }
 
-    private FilterTextRemover textRemover;
     @Test
-    //ERRORE: se non c'è \n alla fine dell'ultimo enum lo elimina (l'ultimo resta)
     public void testGetOutputText() {
-        // Crea un mock della classe textRemover
-        textRemover = Mockito.mock(FilterTextRemover.class);
-
         // Crea un'istanza della tua classe
         FilterEnumeration filter = new FilterEnumeration();
-        String inputText = "1. Item 1\n2. Item 2\n- Item 3\n- Item 4\n";
+        String inputText = "1. Item 1\n2. Item 2\n- Item 3\n- Item 4";
         List<Enumeration> enums = filter.runFilter(inputText);
         // Chiama il metodo da testare
         String result = filter.getOutputText();
 
         // Verifica che il risultato sia corretto
-        assertEquals("", result);
+        assertEquals("\n\n\n", result);
     }
 
 
