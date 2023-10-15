@@ -70,6 +70,7 @@ import operation:
 1. If autobuilding is on, we turn it off.
 2. We import all the plug-ins selected in the import wizard and create a Java
 
+(IncrementalProjectBuilder.INCREMENTAL_BUILD,new SubProgressMonitor(monitor,1));
 
 Note that after step 2, JDT core and PDE start doing stuff simultaneously and
 competing for CPU (bug 31592).  JDT starts the indexing work, while PDE starts
