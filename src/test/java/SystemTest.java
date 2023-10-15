@@ -832,7 +832,21 @@ public class SystemTest {
 
 
 
+    @Test
+    @Disabled
+    public void tc17(){
+        String[] args = {
+                "--charset", "UTF-8",
+                "./system_testing_inputs/tc15.txt",
+                "-o=abc"
+        };
 
+        Main main = new Main();
+        CommandLine cmd = new CommandLine(main);
+        CommandLine.populateCommand(main, args);
+        assertThrows(Exception.class,()-> CommandLine.run(main,args));
+
+    }
 
 
 
