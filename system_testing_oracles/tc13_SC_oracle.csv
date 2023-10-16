@@ -1,0 +1,21 @@
+"Type","Start","End","Code"
+"functioncall","3759","3772","(monitor,1));"
+"ifstatement","6333","6601","if (isJavaProject) {
+	/*IJavaProject jProject = JavaCore.create(project);
+	if (jProject.getRawClasspath() != null
+		&& jProject.getRawClasspath().length > 0)
+		jProject.setRawClasspath(new IClasspathEntry[0], monitor);*/
+	modelIds.add(model.getPluginBase().getId());
+}"
+"ifstatement","6609","6811","if (isJavaProject) {
+	IJavaProject jProject = JavaCore.create(project);
+	jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
+monitor);
+	modelIds.add(model.getPluginBase().getId());
+}"
+"ifstatement","7750","7952","if (isJavaProject) {
+	IJavaProject jProject = JavaCore.create(project);
+	jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
+monitor);
+	modelIds.add(model.getPluginBase().getId());
+}"
