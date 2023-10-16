@@ -1,0 +1,39 @@
+"Amount","Type","Timestamp","Exception","Reason","Depth","Frame"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.debug.core/.classpath is not local.","0","org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.debug.core/.classpath is not local.","1","org.eclipse.core.internal.resources.File.getContents(File.java:213)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.debug.core/.classpath is not local.","2","org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.debug.core/.classpath is not local.","3","org.eclipse.jdt.internal.core.JavaProject.getSharedProperty(JavaProject.java:1793)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.debug.core/.classpath is not local.","4","org.eclipse.jdt.internal.core.JavaProject.readClasspathFile(JavaProject.java:2089)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.debug.core/.classpath is not local.","5","org.eclipse.jdt.internal.core.JavaProject.getRawClasspath(JavaProject.java:1579)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.debug.core/.classpath is not local.","6","org.eclipse.jdt.internal.core.search.indexing.IndexAllProject.execute(IndexAllProject.java:77)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.debug.core/.classpath is not local.","7","org.eclipse.jdt.internal.core.search.processing.JobManager.run(JobManager.java:371)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.jdt.launching/.classpath is not local.","0","org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:307)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.jdt.launching/.classpath is not local.","1","org.eclipse.core.internal.resources.File.getContents(File.java:213)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.jdt.launching/.classpath is not local.","2","org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:677)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.jdt.launching/.classpath is not local.","3","org.eclipse.jdt.internal.core.JavaProject.getSharedProperty(JavaProject.java:1809)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.jdt.launching/.classpath is not local.","4","org.eclipse.jdt.internal.core.JavaProject.readClasspathFile(JavaProject.java:2105)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.jdt.launching/.classpath is not local.","5","org.eclipse.jdt.internal.core.JavaProject.getRawClasspath(JavaProject.java:1593)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.jdt.launching/.classpath is not local.","6","org.eclipse.jdt.internal.core.JavaProject.getRawClasspath(JavaProject.java:1583)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.jdt.launching/.classpath is not local.","7","org.eclipse.jdt.internal.core.JavaProject.getOutputLocation(JavaProject.java:1375)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.jdt.launching/.classpath is not local.","8","org.eclipse.jdt.internal.core.search.indexing.IndexAllProject.execute(IndexAllProject.java:90)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.jdt.launching/.classpath is not local.","9","org.eclipse.jdt.internal.core.search.processing.JobManager.run(JobManager.java:375)"
+"2","Stacktrace","1695976444169","org.eclipse.core.internal.resources.ResourceException",":
+Resource /org.eclipse.jdt.launching/.classpath is not local.","10","java.lang.Thread.run(Thread.java:536)"
