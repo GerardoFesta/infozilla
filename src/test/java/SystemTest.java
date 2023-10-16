@@ -930,7 +930,7 @@ public class SystemTest {
     public void tc13() {
         String[] args = {
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc13.txt",
+                "-f", "./system_testing_inputs/tc13.txt",
                 "-o=csv"
         };
 
@@ -1048,7 +1048,7 @@ public class SystemTest {
     public void tc14() {
         String[] args = {
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc14.txt",
+                "-f","./system_testing_inputs/tc14.txt",
                 "-o=xls"
         };
         try {
@@ -1219,7 +1219,7 @@ public class SystemTest {
         try {
             String[] args = {
                     "--charset", "UTF-8",
-                    "./system_testing_inputs/tc15.txt",
+                    "-f","./system_testing_inputs/tc15.txt",
                     "-o=json"
             };
 
@@ -1288,7 +1288,7 @@ public class SystemTest {
     public void tc16() {
         String[] args = {
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc16.txt",
+                "-f","./system_testing_inputs/tc16.txt",
                 "-o=xml"
         };
 
@@ -1334,7 +1334,7 @@ public class SystemTest {
     public void tc17(){
         String[] args = {
                 "--charset", "UTF-8",
-                "./system_testing_inputs/tc15.txt",
+                "-f","./system_testing_inputs/tc15.txt",
                 "-o=abc"
         };
 
