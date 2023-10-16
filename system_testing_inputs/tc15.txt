@@ -1,4 +1,15 @@
-
+Index: file_modificato1.txt
+===================================================================
+--- file_modificato.txt\t(revision 123)
++++ file_modificato.txt\t(revision 124)
+@@ -1,6 +1,6 @@
+ Riga originale 1
+ Riga originale 2
+ Riga originale 3
++Riga modificata 1
++Riga modificata 2
++Riga aggiunta 2.5
+ Riga originale 4
 Discussion ECLIPSE BUG 39887
 
 Wassim Melhem 2003-07-10 14:27:07 EDT
@@ -87,8 +98,6 @@ Anyway, since this is only a logging problem, and we believe our indexer
 activity should be fault tolerant (given it is running after the fact), we
 modified our code to be more resilient in this scenario, and stop logging this
 problem, which isn't one in the end.
-Here's what we did:
-PATCH
 
 Fixed
 
@@ -145,10 +154,6 @@ automatically a  marker created to signal this problem.
 
 I think there are two solutions here to have these markers not displayed:
 
-1) perform the import in only one operation as suggested by bug 31592
-2) add a temporary .classpth to the project to avoid markers creation while
-treating PRE_AUTO_BUILD event between the two operation
-
 
 I'm not sure if solution 1) is possible, but I've made a try to implement
 solution 2) by modifying method createProject(...) in PluginImportOperation
@@ -180,9 +185,12 @@ Thanks
 Comment 10 Frederic Fusier 2003-09-04 05:19:40 EDT
 Wassim,
 
-- About markers displayed between step 2 and step 3 there's nothing to do on our
-- At the end of step 2, a PRE_AUTO_BUILD event is sent by the
-- As project were created in step 2 without classpath, then we correctly create a
+About markers displayed between step 2 and step 3 there's nothing to do on our
+side about it. At the end of step 2, a PRE_AUTO_BUILD event is sent by the
+running operation and processed by our DeltaProcessor which refreshes markers.
+
+As project were created in step 2 without classpath, then we correctly create a
+markers for each concerned project that its .classpath cannot be read.
 
 As it seems necessary to keep the two separated operations, I suggest to set
 the classpath to the created project in order to avoid these markers to be
@@ -202,7 +210,7 @@ and never got any dead lock nor transient error markers :)
 
 Let me know if this change could be acceptable for you, thanks
 
-FrŽdŽric
+Fr�d�ric
 
 Comment 11 Philippe Mulet 2003-09-04 05:23:45 EDT
 Transient classpath problem markers are expected due to the PDE import process,
@@ -225,49 +233,6 @@ said it triggers quite a lot of activity in an intermediate state, so I am no
 longer convinced it is the best move.
 
 Still worth investigating though, as it could avoid creating transient problems.
-
-Index: file_modificato.txt
-===================================================================
---- file_modificato.txt	(revision 123)
-+++ file_modificato.txt	(revision 124)
-@@ -1,6 +1,6 @@
-
--Riga originale 1
--Riga originale 2
--Riga originale 3
-+Riga modificata 1
-+Riga modificata 2
-+Riga aggiunta 2.5
- Riga originale 4
--Riga originale 5
-+Riga modificata 3
- Riga originale 6
-
-@@ -11,16 +11,16 @@
--Riga originale 11
--Riga originale 12
--Riga originale 13
-+Riga modificata 11
-+Riga modificata 12
-+Riga aggiunta 12.5
- Riga originale 14
--Riga originale 15
-+Riga modificata 13
- Riga originale 16
-
-this is just a random comment to get other things in the report. Thus, here's another patch
-
-Index: main.java
-===================================================================
---- main.java	(revision 123)
-+++ main.java	(revision 124)
-@@ -1,5 +1,5 @@
- public class Main {
--    public static void main(String[] args) {
-+    public static void start(String[] args) {
- int num1 = 10;
- int num2 = 20;
- int sum = num1 + num2;
 
 Comment 14 David Audel 2003-10-14 10:13:14 EDT
 Verified.

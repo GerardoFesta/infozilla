@@ -1,7 +1,88 @@
-<?xml version="1.0" encoding="UTF-8"?><infozilla-output>
-    <Patches amount="0"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<infozilla-output>
+    <Patches amount="2">
+        <Patch>
+            <index>file_modificato.txt</index>
+            <original_file>file_modificato.txt</original_file>
+            <modified_file>file_modificato.txt</modified_file>
+            <Hunks>
+                <hunk>-Riga originale 1&#xD;
+                    &#xD;
+                    -Riga originale 2&#xD;
+                    &#xD;
+                    -Riga originale 3&#xD;
+                    &#xD;
+                    +Riga modificata 1&#xD;
+                    &#xD;
+                    +Riga modificata 2&#xD;
+                    &#xD;
+                    +Riga aggiunta 2.5&#xD;
+                    &#xD;
+                    Riga originale 4&#xD;
+                    &#xD;
+                    -Riga originale 5&#xD;
+                    &#xD;
+                    +Riga modificata 3&#xD;
+                    &#xD;
+                    Riga originale 6</hunk>
+                <hunk>-Riga originale 11&#xD;
+                    &#xD;
+                    -Riga originale 12&#xD;
+                    &#xD;
+                    -Riga originale 13&#xD;
+                    &#xD;
+                    +Riga modificata 11&#xD;
+                    &#xD;
+                    +Riga modificata 12&#xD;
+                    &#xD;
+                    +Riga aggiunta 12.5&#xD;
+                    &#xD;
+                    Riga originale 14&#xD;
+                    &#xD;
+                    -Riga originale 15&#xD;
+                    &#xD;
+                    +Riga modificata 13&#xD;
+                    &#xD;
+                    Riga originale 16</hunk>
+            </Hunks>
+        </Patch>
+        <Patch>
+            <index>1b2c3d..e4f5g6h 100644</index>
+            <original_file>--- a/file_originale.txt</original_file>
+            <modified_file>+++ b/file_modificato.txt</modified_file>
+            <Hunks>
+                <hunk>Questo è un file di esempio.&#xD;
+                    &#xD;
+                    &#xD;
+                    &#xD;
+                    -Riga originale 1&#xD;
+                    &#xD;
+                    -Riga originale 2&#xD;
+                    &#xD;
+                    -Riga originale 3&#xD;
+                    &#xD;
+                    +Riga modificata 1&#xD;
+                    &#xD;
+                    +Riga modificata 2&#xD;
+                    &#xD;
+                    +Riga aggiunta 2.5&#xD;
+                    &#xD;
+                    Riga originale 4&#xD;
+                    &#xD;
+                    -Riga originale 5&#xD;
+                    &#xD;
+                    +Riga modificata 3&#xD;
+                    &#xD;
+                    Riga originale 6&#xD;
+                    &#xD;
+                    Riga originale 7&#xD;
+                    &#xD;
+                    Riga originale 8</hunk>
+            </Hunks>
+        </Patch>
+    </Patches>
     <Stacktraces amount="2">
-        <Stacktrace timestamp="0">
+        <Stacktrace timestamp="1697365780945">
             <Exception>org.eclipse.core.internal.resources.ResourceException</Exception>
             <Reason>:
                 Resource /org.eclipse.debug.core/.classpath is not local.</Reason>
@@ -16,7 +97,7 @@
                 <Frame depth="7">org.eclipse.jdt.internal.core.search.processing.JobManager.run(JobManager.java:371)</Frame>
             </Frames>
         </Stacktrace>
-        <Stacktrace timestamp="0">
+        <Stacktrace timestamp="1697365780945">
             <Exception>org.eclipse.core.internal.resources.ResourceException</Exception>
             <Reason>:
                 Resource /org.eclipse.jdt.launching/.classpath is not local.</Reason>
@@ -35,9 +116,9 @@
             </Frames>
         </Stacktrace>
     </Stacktraces>
-    <SourceCodeRegions amount="9">
+    <SourceCodeRegions amount="3">
         <source_code type="ifstatement">
-            <location start="4764" end="5032"/>
+            <location start="4764" end="5032" />
             <code>if (isJavaProject) {
                 /*IJavaProject jProject = JavaCore.create(project);
                 if (jProject.getRawClasspath() != null
@@ -47,7 +128,7 @@
                 }</code>
         </source_code>
         <source_code type="ifstatement">
-            <location start="5040" end="5242"/>
+            <location start="5040" end="5242" />
             <code>if (isJavaProject) {
                 IJavaProject jProject = JavaCore.create(project);
                 jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
@@ -56,37 +137,13 @@
                 }</code>
         </source_code>
         <source_code type="ifstatement">
-            <location start="6021" end="6223"/>
+            <location start="6021" end="6223" />
             <code>if (isJavaProject) {
                 IJavaProject jProject = JavaCore.create(project);
                 jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
                 monitor);
                 modelIds.add(model.getPluginBase().getId());
                 }</code>
-        </source_code>
-        <source_code type="class">
-            <location start="8212" end="8232"/>
-            <code>public class Main {</code>
-        </source_code>
-        <source_code type="functiondef">
-            <location start="8233" end="8278"/>
-            <code>-    public static void main(String[] args) {</code>
-        </source_code>
-        <source_code type="functiondef">
-            <location start="8279" end="8325"/>
-            <code>+    public static void start(String[] args) {</code>
-        </source_code>
-        <source_code type="assignment">
-            <location start="8326" end="8341"/>
-            <code>int num1 = 10;</code>
-        </source_code>
-        <source_code type="assignment">
-            <location start="8342" end="8357"/>
-            <code>int num2 = 20;</code>
-        </source_code>
-        <source_code type="assignment">
-            <location start="8358" end="8381"/>
-            <code>int sum = num1 + num2;</code>
         </source_code>
     </SourceCodeRegions>
     <Enumerations amount="3">
@@ -111,3 +168,4 @@
         </Enumeration>
     </Enumerations>
 </infozilla-output>
+

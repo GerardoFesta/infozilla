@@ -168,6 +168,9 @@ monitor);
 ## Building
 Building the infoZilla tool requires `gradle` 4 or newer. Run `gradle tasks` for an overview.
 
+## Remote Urls
+If you plan on using infozilla to scrape the issues from a repository by using the -a (or --all) <REPOURL>, then you should add a .env file in the root folder containing GITHUB_ACCESS_TOKEN=<YourToken>. If you want to create a token, you should visit [this page](https://github.com/settings/tokens) and create a fine-grained token. For more info check [this page](https://docs.github.com/en/rest/overview/authenticating-to-the-rest-api?apiVersion=2022-11-28#authenticating-with-a-token-generated-by-an-app). This is needed because, without the authentication, you will have a limit of 60 operations per hour (with the auth you will have 5000), which means you will be able to scrape <=60 - depending on the filters - issues. 
+
 
 ## Citing
 If you like the tool and find it useful, feel free to cite the original research work:

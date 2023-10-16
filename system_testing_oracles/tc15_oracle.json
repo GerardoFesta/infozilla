@@ -1,0 +1,145 @@
+{
+    "StackTraces": {
+        "amount": 2,
+        "Stacktraces": [
+            {
+                "Frames": [
+                    {
+                        "depth": 0,
+                        "frame": "org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:313)"
+                    },
+                    {
+                        "depth": 1,
+                        "frame": "org.eclipse.core.internal.resources.File.getContents(File.java:213)"
+                    },
+                    {
+                        "depth": 2,
+                        "frame": "org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:671)"
+                    },
+                    {
+                        "depth": 3,
+                        "frame": "org.eclipse.jdt.internal.core.JavaProject.getSharedProperty(JavaProject.java:1793)"
+                    },
+                    {
+                        "depth": 4,
+                        "frame": "org.eclipse.jdt.internal.core.JavaProject.readClasspathFile(JavaProject.java:2089)"
+                    },
+                    {
+                        "depth": 5,
+                        "frame": "org.eclipse.jdt.internal.core.JavaProject.getRawClasspath(JavaProject.java:1579)"
+                    },
+                    {
+                        "depth": 6,
+                        "frame": "org.eclipse.jdt.internal.core.search.indexing.IndexAllProject.execute(IndexAllProject.java:77)"
+                    },
+                    {
+                        "depth": 7,
+                        "frame": "org.eclipse.jdt.internal.core.search.processing.JobManager.run(JobManager.java:371)"
+                    }
+                ],
+                "type": "Stacktrace",
+                "Exception": "org.eclipse.core.internal.resources.ResourceException",
+                "Reason": ":\nResource /org.eclipse.debug.core/.classpath is not local.",
+                "timestamp": 1696166170725
+            },
+            {
+                "Frames": [
+                    {
+                        "depth": 0,
+                        "frame": "org.eclipse.core.internal.resources.Resource.checkLocal(Resource.java:307)"
+                    },
+                    {
+                        "depth": 1,
+                        "frame": "org.eclipse.core.internal.resources.File.getContents(File.java:213)"
+                    },
+                    {
+                        "depth": 2,
+                        "frame": "org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray(Util.java:677)"
+                    },
+                    {
+                        "depth": 3,
+                        "frame": "org.eclipse.jdt.internal.core.JavaProject.getSharedProperty(JavaProject.java:1809)"
+                    },
+                    {
+                        "depth": 4,
+                        "frame": "org.eclipse.jdt.internal.core.JavaProject.readClasspathFile(JavaProject.java:2105)"
+                    },
+                    {
+                        "depth": 5,
+                        "frame": "org.eclipse.jdt.internal.core.JavaProject.getRawClasspath(JavaProject.java:1593)"
+                    },
+                    {
+                        "depth": 6,
+                        "frame": "org.eclipse.jdt.internal.core.JavaProject.getRawClasspath(JavaProject.java:1583)"
+                    },
+                    {
+                        "depth": 7,
+                        "frame": "org.eclipse.jdt.internal.core.JavaProject.getOutputLocation(JavaProject.java:1375)"
+                    },
+                    {
+                        "depth": 8,
+                        "frame": "org.eclipse.jdt.internal.core.search.indexing.IndexAllProject.execute(IndexAllProject.java:90)"
+                    },
+                    {
+                        "depth": 9,
+                        "frame": "org.eclipse.jdt.internal.core.search.processing.JobManager.run(JobManager.java:375)"
+                    },
+                    {
+                        "depth": 10,
+                        "frame": "java.lang.Thread.run(Thread.java:536)"
+                    }
+                ],
+                "type": "Stacktrace",
+                "Exception": "org.eclipse.core.internal.resources.ResourceException",
+                "Reason": ":\nResource /org.eclipse.jdt.launching/.classpath is not local.",
+                "timestamp": 1696166170725
+            }
+        ]
+    },
+    "Enumerations": {
+        "amount": 1,
+        "Enumerations": [{
+            "lines": 2,
+            "Lines": [
+                "1. If autobuilding is on, we turn it off.",
+                "2. We import all the plug-ins selected in the import wizard and create a Java"
+            ]
+        }]
+    },
+    "SourceCodeRegions": {
+        "amount": 3,
+        "SourceCodeRegions": [
+            {
+                "code": "if (isJavaProject) {\n\t/*IJavaProject jProject = JavaCore.create(project);\n\tif (jProject.getRawClasspath() != null\n\t\t&& jProject.getRawClasspath().length > 0)\n\t\tjProject.setRawClasspath(new IClasspathEntry[0], monitor);*/\n\tmodelIds.add(model.getPluginBase().getId());\n}",
+                "location": {
+                    "start": 4534,
+                    "end": 4802
+                },
+                "type": "ifstatement"
+            },
+            {
+                "code": "if (isJavaProject) {\n\tIJavaProject jProject = JavaCore.create(project);\n\tjProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),\nmonitor);\n\tmodelIds.add(model.getPluginBase().getId());\n}",
+                "location": {
+                    "start": 4810,
+                    "end": 5012
+                },
+                "type": "ifstatement"
+            },
+            {
+                "code": "if (isJavaProject) {\n\tIJavaProject jProject = JavaCore.create(project);\n\tjProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),\nmonitor);\n\tmodelIds.add(model.getPluginBase().getId());\n}",
+                "location": {
+                    "start": 5951,
+                    "end": 6153
+                },
+                "type": "ifstatement"
+            }
+        ]
+    },
+    "Patches": {
+        "amount": 1,
+        "Patches": [{
+            "original_file": "file_modificato.txt\\t(revision",
+            "Hunks":
+            [{"hunk": "\r\n Riga originale 1\r\n\r\n Riga originale 2\r\n\r\n Riga originale 3\r\n\r\n+Riga modificata 1\r\n\r\n+Riga modificata 2\r\n\r\n+Riga aggiunta 2.5\r\n\r\n Riga originale 4\r\n\r"}],
+            "modified_file":"file_modificato.txt\\t(revision","index":"file_modificato1.txt"}] } }
+
