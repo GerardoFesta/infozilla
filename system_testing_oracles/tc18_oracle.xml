@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infozilla-output>
+  <Patches amount="0" />
+  <Stacktraces amount="0" />
+  <SourceCodeRegions amount="0" />
+  <Enumerations amount="1">
+    <Enumeration lines="2">
+      <Lines>
+        <Line>1. Addition of Remote Repository Analysis Support: In the main class, a parameter will be added to allow users to input a GitHub repository URL. Naturally, compatibility with local files will be maintained.</Line>
+        <Line>2. Filtering and downloading: a new class/a new set of methods (depending on the resulting CR5 implementation) will be added in order to parameterize issue selection and download to perform analysis</Line>
+      </Lines>
+    </Enumeration>
+  </Enumerations>
+</infozilla-output>

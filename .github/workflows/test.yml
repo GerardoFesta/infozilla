@@ -2,7 +2,10 @@ name: Run Tests
 
 on: [push]
 
+env:
+  GITHUB_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 jobs:
+
   test:
     name: Run System Tests
     runs-on: windows-latest
@@ -19,3 +22,5 @@ jobs:
 
       - name: Run All System Tests
         run: ./gradlew clean test --tests "SystemTest.*"
+
+
