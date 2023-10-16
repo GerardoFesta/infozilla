@@ -99,66 +99,37 @@
     "Enumerations": {
         "amount": 1,
         "Enumerations": [{
-            "lines": 23,
+            "lines": 2,
             "Lines": [
                 "1. If autobuilding is on, we turn it off.",
-                "",
-                "2. We import all the plug-ins selected in the import wizard and create a Java",
-                "project for each plug-in that contains libraries.  Note that at this step, we",
-                "used to clear the classpath of the freshly created Java project because we",
-                "will correctly set it at a later step.  However, just before we released 2.1,",
-                "Philippe suggested in bug report 34574 that we do not flush the classpath",
-                "completely.  So we stopped flushing the classpath at this point, and this",
-                "introduced the transient error markers that we now see in the Problems view in",
-                "the middle of the operation.  Since these error markers go away later in step",
-                "3 when we set the classpath, we regarded them as benign, yet still annoying,",
-                "intermediary entities.  This step is done in an IWorkspace.run",
-                "(IWorkspaceRunnable, IProgressMonitor) operation.",
-                "",
-                "3. We set the classpath of all the projects that were succesfully imported",
-                "into the workspace. This step has to be done in a subsequent IWorkspace.run",
-                "(IWorkspaceRunnable, IProgressMonitor) operation for an accurate classpath",
-                "computation.  i.e. the Java projects from step 2 have to become part of the",
-                "workspace before we set their classpath.",
-                "",
-                "4.  If we had turned autobuilding off in step 1, we turn it back on and invoke",
-                "a build via PDEPlugin.getWorkspace().build",
-                "(IncrementalProjectBuilder.INCREMENTAL_BUILD,new SubProgressMonitor"
+                "2. We import all the plug-ins selected in the import wizard and create a Java"
             ]
         }]
     },
     "SourceCodeRegions": {
-        "amount": 4,
+        "amount": 3,
         "SourceCodeRegions": [
-            {
-                "code": "(monitor,1));",
-                "location": {
-                    "start": 3759,
-                    "end": 3772
-                },
-                "type": "functioncall"
-            },
             {
                 "code": "if (isJavaProject) {\n\t/*IJavaProject jProject = JavaCore.create(project);\n\tif (jProject.getRawClasspath() != null\n\t\t&& jProject.getRawClasspath().length > 0)\n\t\tjProject.setRawClasspath(new IClasspathEntry[0], monitor);*/\n\tmodelIds.add(model.getPluginBase().getId());\n}",
                 "location": {
-                    "start": 6333,
-                    "end": 6601
+                    "start": 4534,
+                    "end": 4802
                 },
                 "type": "ifstatement"
             },
             {
                 "code": "if (isJavaProject) {\n\tIJavaProject jProject = JavaCore.create(project);\n\tjProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),\nmonitor);\n\tmodelIds.add(model.getPluginBase().getId());\n}",
                 "location": {
-                    "start": 6609,
-                    "end": 6811
+                    "start": 4810,
+                    "end": 5012
                 },
                 "type": "ifstatement"
             },
             {
                 "code": "if (isJavaProject) {\n\tIJavaProject jProject = JavaCore.create(project);\n\tjProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),\nmonitor);\n\tmodelIds.add(model.getPluginBase().getId());\n}",
                 "location": {
-                    "start": 7750,
-                    "end": 7952
+                    "start": 5951,
+                    "end": 6153
                 },
                 "type": "ifstatement"
             }
@@ -168,9 +139,7 @@
         "amount": 1,
         "Patches": [{
             "original_file": "file_modificato.txt\\t(revision",
-            "Hunks": [{"hunk": "\r\n Riga originale 1\r\n\r\n Riga originale 2\r\n\r\n Riga originale 3\r\n\r\n+Riga modificata 1\r\n\r\n+Riga modificata 2\r\n\r\n+Riga aggiunta 2.5\r\n\r\n Riga originale 4\r"}],
-            "modified_file": "file_modificato.txt\\t(revision",
-            "index": "file_modificato1.txt"
-        }]
-    }
-}
+            "Hunks":
+            [{"hunk": "\r\n Riga originale 1\r\n\r\n Riga originale 2\r\n\r\n Riga originale 3\r\n\r\n+Riga modificata 1\r\n\r\n+Riga modificata 2\r\n\r\n+Riga aggiunta 2.5\r\n\r\n Riga originale 4\r\n\r"}],
+            "modified_file":"file_modificato.txt\\t(revision","index":"file_modificato1.txt"}] } }
+

@@ -1,3 +1,4 @@
+
 Discussion ECLIPSE BUG 39887
 
 Wassim Melhem 2003-07-10 14:27:07 EDT
@@ -68,26 +69,8 @@ Here is a breakdown of the activities that take place during the plug-in
 import operation:
 
 1. If autobuilding is on, we turn it off.
-
 2. We import all the plug-ins selected in the import wizard and create a Java
-project for each plug-in that contains libraries.  Note that at this step, we
-used to clear the classpath of the freshly created Java project because we
-will correctly set it at a later step.  However, just before we released 2.1,
-Philippe suggested in bug report 34574 that we do not flush the classpath
-completely.  So we stopped flushing the classpath at this point, and this
-introduced the transient error markers that we now see in the Problems view in
-the middle of the operation.  Since these error markers go away later in step
-3 when we set the classpath, we regarded them as benign, yet still annoying,
-intermediary entities.  This step is done in an IWorkspace.run(IWorkspaceRunnable, IProgressMonitor); operation.
 
-3. We set the classpath of all the projects that were succesfully imported
-into the workspace. This step has to be done in a subsequent IWorkspace.run(IWorkspaceRunnable, IProgressMonitor);
-operation for an accurate classpath computation.
-i.e. the Java projects from step 2 have to become part of the workspace before we set their classpath.
-
-4.  If we had turned autobuilding off in step 1, we turn it back on and invoke
-a build via PDEPlugin.getWorkspace().build
-(IncrementalProjectBuilder.INCREMENTAL_BUILD,new SubProgressMonitor(monitor,1));
 
 Note that after step 2, JDT core and PDE start doing stuff simultaneously and
 competing for CPU (bug 31592).  JDT starts the indexing work, while PDE starts
@@ -112,6 +95,34 @@ Fixed
 Comment 7 Frederic Fusier 2003-09-03 11:54:25 EDT
 While testing PDE external plugins import, I got another similar exception in
 the indexer:
+!ENTRY org.eclipse.jdt.core 4 4 Sep 03, 2003 17:02:24.860
+!MESSAGE Exception while retrieving /org.eclipse.jdt.launching/.classpath, will
+revert to default classpath
+!STACK 1
+org.eclipse.core.internal.resources.ResourceException:
+Resource /org.eclipse.jdt.launching/.classpath is not local.
+	at org.eclipse.core.internal.resources.Resource.checkLocal
+(Resource.java:307)
+	at org.eclipse.core.internal.resources.File.getContents(File.java:213)
+	at org.eclipse.jdt.internal.core.Util.getResourceContentsAsByteArray
+(Util.java:677)
+	at org.eclipse.jdt.internal.core.JavaProject.getSharedProperty
+(JavaProject.java:1809)
+	at org.eclipse.jdt.internal.core.JavaProject.readClasspathFile
+(JavaProject.java:2105)
+	at org.eclipse.jdt.internal.core.JavaProject.getRawClasspath
+(JavaProject.java:1593)
+	at org.eclipse.jdt.internal.core.JavaProject.getRawClasspath
+(JavaProject.java:1583)
+	at org.eclipse.jdt.internal.core.JavaProject.getOutputLocation
+(JavaProject.java:1375)
+	at org.eclipse.jdt.internal.core.search.indexing.IndexAllProject.execute
+(IndexAllProject.java:90)
+	at org.eclipse.jdt.internal.core.search.processing.JobManager.run
+(JobManager.java:375)
+	at java.lang.Thread.run(Thread.java:536)
+!ENTRY org.eclipse.core.resources 4 369 Sep 03, 2003 17:02:24.860
+!MESSAGE Resource /org.eclipse.jdt.launching/.classpath is not local.
 
 Comment 8 Frederic Fusier 2003-09-03 11:56:53 EDT
 Created attachment 5960 [details]
@@ -143,7 +154,21 @@ I'm not sure if solution 1) is possible, but I've made a try to implement
 solution 2) by modifying method createProject(...) in PluginImportOperation
 class.
 I've replace following code:
+if (isJavaProject) {
+	/*IJavaProject jProject = JavaCore.create(project);
+	if (jProject.getRawClasspath() != null
+		&& jProject.getRawClasspath().length > 0)
+		jProject.setRawClasspath(new IClasspathEntry[0], monitor);*/
+	modelIds.add(model.getPluginBase().getId());
+}
 
+with:
+if (isJavaProject) {
+	IJavaProject jProject = JavaCore.create(project);
+	jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
+monitor);
+	modelIds.add(model.getPluginBase().getId());
+}
 
 And it seems to work properly (import does not hang and no markers are
 displayed bewteen two steps).
@@ -155,20 +180,22 @@ Thanks
 Comment 10 Frederic Fusier 2003-09-04 05:19:40 EDT
 Wassim,
 
-About markers displayed between step 2 and step 3 there's nothing to do on our
-side about it.
-At the end of step 2, a PRE_AUTO_BUILD event is sent by the
-running operation and processed by our DeltaProcessor which refreshes markers.
-As project were created in step 2 without classpath, then we correctly create a
-markers for each concerned project that its .classpath cannot be read.
+- About markers displayed between step 2 and step 3 there's nothing to do on our
+- At the end of step 2, a PRE_AUTO_BUILD event is sent by the
+- As project were created in step 2 without classpath, then we correctly create a
 
 As it seems necessary to keep the two separated operations, I suggest to set
 the classpath to the created project in order to avoid these markers to be
 displayed.
 
 I've made a try modifying createProject(...) method of PluginImportOperation.
-At the end of the method I've changed the block as follow:
-
+At the end of the method I've changed the if(isJavaProject) block as follow:
+if (isJavaProject) {
+	IJavaProject jProject = JavaCore.create(project);
+	jProject.setRawClasspath(new IClasspathEntry[0], project.getFullPath(),
+monitor);
+	modelIds.add(model.getPluginBase().getId());
+}
 
 After that, I've made several import operation with new or replacing projects
 and never got any dead lock nor transient error markers :)
@@ -199,12 +226,12 @@ longer convinced it is the best move.
 
 Still worth investigating though, as it could avoid creating transient problems.
 
+
 Index: file_modificato.txt
 ===================================================================
 --- file_modificato.txt	(revision 123)
 +++ file_modificato.txt	(revision 124)
 @@ -1,6 +1,6 @@
-
 
 -Riga originale 1
 -Riga originale 2
@@ -217,7 +244,7 @@ Index: file_modificato.txt
 +Riga modificata 3
  Riga originale 6
 
- @@ -11,16 +11,16 @@
+@@ -11,16 +11,16 @@
 -Riga originale 11
 -Riga originale 12
 -Riga originale 13
@@ -229,5 +256,26 @@ Index: file_modificato.txt
 +Riga modificata 13
  Riga originale 16
 
+this is just a random comment to get other things in the report. Thus, here's another patch
+
+diff --git a/file_originale.txt b/file_modificato.txt
+index a1b2c3d..e4f5g6h 100644
+--- a/file_originale.txt
++++ b/file_modificato.txt
+@@ -1,6 +1,6 @@
+ Questo è un file di esempio.
+
+-Riga originale 1
+-Riga originale 2
+-Riga originale 3
++Riga modificata 1
++Riga modificata 2
++Riga aggiunta 2.5
+ Riga originale 4
+-Riga originale 5
++Riga modificata 3
+ Riga originale 6
+ Riga originale 7
+ Riga originale 8
 Comment 14 David Audel 2003-10-14 10:13:14 EDT
 Verified.
