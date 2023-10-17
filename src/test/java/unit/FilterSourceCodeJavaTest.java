@@ -1,4 +1,4 @@
-package Junit;
+package unit;
 
 import static org.junit.Assert.*;
 
@@ -6,11 +6,9 @@ import io.kuy.infozilla.elements.sourcecode.java.CodeRegion;
 import io.kuy.infozilla.filters.FilterSourceCodeJAVA;
 import org.junit.Before;
 import org.junit.Test;
-import java.io.ByteArrayInputStream;
+
 import java.io.File;
-import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 
 public class FilterSourceCodeJavaTest {

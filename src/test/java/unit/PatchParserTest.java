@@ -1,4 +1,4 @@
-package Junit;
+package unit;
 
 
 import io.kuy.infozilla.elements.patch.Patch;

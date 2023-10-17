@@ -1,4 +1,4 @@
-package Junit;
+package unit;
 
 import io.kuy.infozilla.elements.stacktrace.java.StackTrace;
 import io.kuy.infozilla.filters.FilterStackTraceJAVA;
