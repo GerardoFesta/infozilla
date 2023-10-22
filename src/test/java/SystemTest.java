@@ -583,14 +583,14 @@ public class SystemTest {
     public void tc22(){
         String[] args = {
                 "--charset", "UTF-8",
-                "-a", "https://github.com/gerardofesta/GRUPPO25-CleanWater/"
+                "-a", "https://github.com/gianlucast/Progetto-IS-ecommerce"
         };
 
         Main main = new Main();
         CommandLine.run(main, args);
 
         File directory = new File(".");
-        String pattern = "gerardofesta-GRUPPO25-CleanWater-\\d+Issue\\.txt\\.result\\.xml";
+        String pattern = "gianlucast-Progetto-IS-ecommerce-\\d+Issue\\.txt\\.result\\.xml";
 
         File[] matchingFiles = directory.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -598,25 +598,10 @@ public class SystemTest {
             }
         });
 
-        if (matchingFiles == null || matchingFiles.length == 0 || matchingFiles.length>3) {
+        if (matchingFiles == null || matchingFiles.length !=1) {
             fail();
-        }else{
-            boolean flag1 = false, flag2 =false, flag3 =false;
-            for (File file : matchingFiles) {
-                if (!flag1 && file.getName().contains("gerardofesta-GRUPPO25-CleanWater-1Issue.txt.result.xml")) {
-                    flag1=true;
-                }else{
-                    if(!flag2 && file.getName().contains("gerardofesta-GRUPPO25-CleanWater-2Issue.txt.result.xml")){
-                        flag2=true;
-                    }else{
-                        if(!flag3 && file.getName().contains("gerardofesta-GRUPPO25-CleanWater-3Issue.txt.result.xml")){
-                            flag3=true;
-                        }
-                    }
-                }
-            }
-            if(!(flag1 && flag2 && flag3))
-                fail();
+        }else {
+            assertTrue(matchingFiles[0].getName().equalsIgnoreCase("gianlucast-Progetto-IS-ecommerce-1Issue.txt.result.xml"));
         }
     }
 
