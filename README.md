@@ -1,5 +1,5 @@
 # infoZilla - IGES
-The `infoZilla` tool is a library and tool for extracting structural software engineering data from unstructrured data sources such as e-mails, discussions, bug reports and wiki pages.
+The `infoZilla` tool is a library and tool for extracting structural software engineering data from unstructrured data sources such as e-mails, discussions, bug reports and wiki pages, and now also from remote repositories and issues.
 
 Out of the box, the `infoZilla` tool finds the following artefacts:
 
@@ -8,14 +8,26 @@ Source code as small- to medium-sized code examples are often used to illustrate
 
 ![source code](docs/annotated_source.png)
 
-## Patches
+## Patches (Modified for the IGES project)
 
-Patches represent a small piece of software designed to update or fix problems with a computer program or supporting data. The mostly used format of patches is the unified diff format.
+Patches represent a small piece of software designed to update or fix problems with a computer program or supporting data. The mostly used format of patches is the unified diff format, which is now(!) supported thanks to the IGES modifications (CR2 specifically). Previously, the only supported format was unified diff format with Index Line (which is still supported). 
+Patches went through two CRs:
+
+-CR1 fixed many problems within patch recognition, mainly hunks recognition and patch correct detection and removal
+
+-CR2 implemented support to the unified diff format (without index line)
+
+More details are in the IGES_Documents folder, where test plan, modifications proposals and implementations are detailed.
 
 ![patches](docs/annotated_patch.png)
 
-## Enumerations and Itemizations
+## Enumerations and Itemizations (Modified for the IGES project)
 Enumerations and itemizations are used to list items, describe a chain of causality, or present a sequence of actions the developer has to take in order to be able to reproduce or fix a problem. They add structure to the description of a problem and  ease understanding.
+Enumerations went through one CR:
+
+-CR3 fixed several issues with the enumeration recognition, since previously, enumerations of the same type were not recognized correctly, multiple enumerations were put together under a single enumeration and the last element of an enumeration was not correctly deleted.
+
+More details are in the IGES_Documents folder, where test plan, modifications proposals and implementations are detailed.
 
 ![enumerations](docs/annotated_enum.png)
 
@@ -24,28 +36,36 @@ Stack traces list the active stack frames in the calling stack upon execution of
 
 ![stacktraces](docs/annotated_trace.png)
 
-## Talkback Traces
-Talkback traces detail the crash contexts and environment details when a problem is detected.
 
-![talkback](docs/annotated_talkback.png)
-
-## Usage
+## Usage (Modified for the IGES Project)
 ```
-Usage: infozilla [-clps] [--charset=<inputCharset>] FILE...
-      FILE...              File(s) to process.
-      --charset=<inputCharset>
-                           Character Set of Input (default=ISO-8859-1)
+Usage: infozilla [-clps] [--charset=<inputCharset>]
+  -f=<FILE>              File(s) to process.
+  --charset=<inputCharset>        Character Set of Input (default=ISO-8859-1)
   -c, --with-source-code   Process and extract source code regions (default=true)
   -l, --with-lists         Process and extract lists (default=true)
   -p, --with-patches       Process and extract patches (default=true)
   -s, --with-stacktraces   Process and extract stacktraces (default=true)
+  -u=<remoteUrl>            Remote github issue url
+  -o --outputFormat formt  Output format(xls, csv, json, XML, default=XML)
+  -a, --all=<repo_url>       Remote github repository to process
+  -ob, --opened-before=<date>    TO USE WITH -a, you can select issues only opened before the date
+  -oa, --opened-after=<date>     TO USE WITH -a, you can select issues only opened after the date
+  -cb, --closed-before=<date>    TO USE WITH -a, you can select issues only closed before the date
+  -ca, --closed-after=<date>     TO USE WITH -a, you can select issues only closed after the date
+  -la, --label=<label>         TO USE WITH -a, you can select issues only with that label(s) (for more labels use -la multiple times)
+  -as, --assignee=<assignee>     TO USE WITH -a, you can select issues only assigned to the assignee
+  -st, --state=<state>           TO USE WITH -a, you can select issues only in the state (open, closed, all)
+  
+  
+
 ```
 
 ## Quickstart
 Run the tool against a sample bug report:
 
 ```
-gradle run --args="demo/demo0001.txt"
+gradle run --args="-f=demo/demo0001.txt"
 
 Task :run
 Extracted Structural Elements from demo/demo0001.txt
@@ -168,8 +188,18 @@ monitor);
 ## Building
 Building the infoZilla tool requires `gradle` 4 or newer. Run `gradle tasks` for an overview.
 
-## Remote Urls
-If you plan on using infozilla to scrape the issues from a repository by using the -a (or --all) <REPOURL>, then you should add a .env file in the root folder containing GITHUB_ACCESS_TOKEN=<YourToken>. If you want to create a token, you should visit [this page](https://github.com/settings/tokens) and create a fine-grained token. For more info check [this page](https://docs.github.com/en/rest/overview/authenticating-to-the-rest-api?apiVersion=2022-11-28#authenticating-with-a-token-generated-by-an-app). This is needed because, without the authentication, you will have a limit of 60 operations per hour (with the auth you will have 5000), which means you will be able to scrape <=60 - depending on the filters - issues. 
+
+
+## Remote Urls (Introduced by IGES Project)
+If you plan on using infozilla to scrape the issues from a repository by using the -a (or --all) REPOURL, then you should add a .env file in the root folder containing GITHUB_ACCESS_TOKEN=YourToken. If you want to create a token, you should visit [this page](https://github.com/settings/tokens) and create a fine-grained token. For more info check [this page](https://docs.github.com/en/rest/overview/authenticating-to-the-rest-api?apiVersion=2022-11-28#authenticating-with-a-token-generated-by-an-app). This is needed because, without the authentication, you will have a limit of 60 operations per hour (with the auth you will have 5000), which means you will be able to scrape <=60 - depending on the filters - issues. 
+
+## Testing (Introduced by IGES Project)
+A new test suite was put in place for the project, with each of the filters having 70%+ coverage, against the previous 0%. System tests, created through category partition, are automated via github action within the repository for each commit.
+For more details, please check the IGES_Documents folder, where you can check all the test specifications and incident reports.
+All the testing and the implementations were made within the Windows environment (also the system testing vm). We do not know if everything will work under different SOs. Let us know if you try!
+
+
+
 
 
 ## Citing
